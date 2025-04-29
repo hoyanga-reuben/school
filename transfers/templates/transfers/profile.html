@@ -1,0 +1,23 @@
+{% extends 'transfers/base_generic.html' %}
+{% load static %}
+{% block title %}Profile{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h2>My Profile</h2>
+
+    <div class="profile-card">
+        <img src="{{ user.profile.image.url }}" alt="Profile Picture" 
+     class="profile-image"
+     onerror="this.src=this.dataset.src;"
+     data-src="{% static 'images/default_profile.png' %}">
+
+
+        <h3>{{ user.get_full_name }}</h3>
+        <p><strong>Email:</strong> {{ user.email }}</p>
+        <p><strong>Role:</strong> {{ user.profile.role|capfirst }}</p>
+
+        <a href="{% url 'transfers:edit_profile' %}" class="btn-edit">Edit Profile</a>
+    </div>
+</div>
+{% endblock %}

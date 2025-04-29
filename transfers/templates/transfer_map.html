@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Teacher Transfer Map</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+  <style>
+    #map {
+      height: 600px;
+      width: 100%;
+    }
+  </style>
+</head>
+<body>
+  <h2>Teacher Transfer Map</h2>
+  <div id="map"></div>
+
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+  <script>
+    var map = L.map('map').setView([-6.3690, 34.8888], 6);  // Center of Tanzania
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 18,
+    }).addTo(map);
+
+    // Define markers from Django context safely using JSON
+    const transfers = JSON.parse(`{{ transfers_json|safe }}`);
+
+    transfers.forEach(transfer => {
+      const currLat = transfer.current_lat;
+      const currLng = transfer.current_lng;
+      const desLat = transfer.desired_lat;
+      const desLng = transfer.desired_lng;
+
+      if (currLat && currLng && desLat && desLng) {
+        const currMarker = L.marker([currLat, currLng]).addTo(map)
+          .bindPopup(`${transfer.full_name}<br><b>Current:</b> ${transfer.current_name}`);
+
+        const desMarker = L.marker([desLat, desLng], {
+          icon: L.icon({
+            iconUrl: 'https://cdn-icons-png.flaticon.com/512/684/684908.png',
+            iconSize: [25, 25]
+          })
+        }).addTo(map)
+          .bindPopup(`<b>Desired:</b> ${transfer.desired_name}`);
+
+        const polyline = L.polyline([
+          [currLat, currLng],
+          [desLat, desLng]
+        ], { color: 'blue' }).addTo(map);
+      } else {
+        console.log("Missing coordinates for:", transfer.full_name);
+      }
+    });
+  </script>
+</body>
+</html>

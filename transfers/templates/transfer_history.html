@@ -1,0 +1,31 @@
+{% extends 'base_generic.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>My Transfer History</h2>
+    <table class="table table-bordered mt-3">
+        <thead>
+            <tr>
+                <th>Submitted On</th>
+                <th>Current School</th>
+                <th>Desired School</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for request in transfer_requests %}
+            <tr>
+                <td>{{ request.submitted_at }}</td>
+                <td>{{ request.current_school }}</td>
+                <td>{{ request.desired_school }}</td>
+                <td>{{ request.status }}</td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="4">No transfer requests submitted yet.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

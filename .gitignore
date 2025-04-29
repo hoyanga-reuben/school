@@ -1,0 +1,54 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.pyc
+
+# Environments
+.env
+.venv/
+env/
+venv/
+ENV/
+*.env
+
+# Django
+*.log
+*.pot
+*.pyc
+db.sqlite3
+media/
+staticfiles/  # You can keep this if you're using collectstatic output
+
+# VS Code & IDEs
+.vscode/
+.idea/
+
+# Byte-compiled / optimized / DLL files
+*.so
+*.dll
+
+# Test / coverage files
+.coverage
+.tox/
+nosetests.xml
+coverage.xml
+*.cover
+*.log
+htmlcov/
+
+# Migrations (optional if you regenerate)
+# ** Be careful: removing them from Git may break deployment
+# */migrations/
+# !*/migrations/__init__.py
+
+# Node
+node_modules/
+
+# System
+.DS_Store
+Thumbs.db
+
+# Git
+.gitattributes

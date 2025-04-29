@@ -1,0 +1,42 @@
+{% extends 'transfers/base_generic.html' %}
+{% block title %}Regional Pending Transfers{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h2>Regional Pending Transfer Requests</h2>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Teacher</th>
+                <th>Current District</th>
+                <th>Desired District</th>
+                <th>Status</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for transfer in transfers %}
+                <tr>
+                    <td>{{ transfer.teacher.full_name }}</td>
+                    <td>{{ transfer.current_school.district.name }}</td>
+                    <td>{{ transfer.desired_school.district.name }}</td>
+                    <td>{{ transfer.status }}</td>
+                    <td>
+                        <form action="{% url 'region_approve_transfer' transfer.id %}" method="post" style="display:inline;">
+                            {% csrf_token %}
+                            <button type="submit" class="btn-approve">Approve</button>
+                        </form>
+                        <form action="{% url 'region_reject_transfer' transfer.id %}" method="post" style="display:inline;">
+                            {% csrf_token %}
+                            <button type="submit" class="btn-reject">Reject</button>
+                        </form>
+                    </td>
+                </tr>
+            {% empty %}
+                <tr><td colspan="5">No pending transfer requests.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

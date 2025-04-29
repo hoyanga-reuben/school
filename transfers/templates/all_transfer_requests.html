@@ -1,0 +1,43 @@
+<h2>Transfer Requests in Your Region</h2>
+
+<form method="get">
+  <label>Subject:</label>
+  <input type="text" name="subject" value="{{ subject_filter }}">
+
+  <label>Status:</label>
+  <select name="status">
+    <option value="">-- All --</option>
+    <option value="pending" {% if status_filter == "pending" %}selected{% endif %}>Pending</option>
+    <option value="approved" {% if status_filter == "approved" %}selected{% endif %}>Approved</option>
+    <option value="rejected" {% if status_filter == "rejected" %}selected{% endif %}>Rejected</option>
+  </select>
+
+  <button type="submit">Filter</button>
+</form>
+
+<br>
+
+<table border="1">
+  <thead>
+    <tr>
+      <th>Teacher</th>
+      <th>Subject</th>
+      <th>Current School</th>
+      <th>Desired School</th>
+      <th>Status</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for req in requests %}
+      <tr>
+        <td>{{ req.teacher.get_full_name }}</td>
+        <td>{{ req.subject_taught }}</td>
+        <td>{{ req.current_school.name }}</td>
+        <td>{{ req.desired_school.name }}</td>
+        <td>{{ req.status }}</td>
+      </tr>
+    {% empty %}
+      <tr><td colspan="5">No matching transfer requests.</td></tr>
+    {% endfor %}
+  </tbody>
+</table>

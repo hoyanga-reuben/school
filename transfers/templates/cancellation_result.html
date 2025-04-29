@@ -1,0 +1,29 @@
+{% extends "base_generic.html" %}
+
+{% block content %}
+  <div class="container mt-4">
+    <h2>Cancel Transfer Request</h2>
+    <p><strong>Status:</strong> {{ transfer.status }}</p>
+
+    {% if can_cancel %}
+      <form method="post">
+        {% csrf_token %}
+        <p>Are you sure you want to cancel this transfer request?</p>
+        <div class="mt-3">
+          <button type="submit" class="btn btn-danger">✅ Yes, Cancel Request</button>
+          <a href="{% url 'transfers:transfer_summary' %}" class="btn btn-secondary">❌ No, Go Back</a>
+        </div>
+      </form>
+    {% else %}
+      <div class="alert alert-warning mt-3">
+        <p><strong>This request cannot be cancelled.</strong></p>
+        {% if transfer.status != "Pending" %}
+          <p>Reason: It has already been <strong>{{ transfer.status|capfirst }}</strong>.</p>
+        {% else %}
+          <p>Reason: Either the <strong>24-hour limit</strong> passed or you reached the <strong>maximum of 3 cancellations</strong>.</p>
+        {% endif %}
+      </div>
+      <a href="{% url 'transfers:transfer_summary' %}" class="btn btn-primary mt-2">🔙 Back to My Requests</a>
+    {% endif %}
+  </div>
+{% endblock %}

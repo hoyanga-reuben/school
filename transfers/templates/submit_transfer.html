@@ -1,0 +1,227 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Submit Transfer Request</title>
+    <link rel="stylesheet" href="{% static 'css/transfer_form.css' %}">
+</head>
+<body>
+  <!-- HEADER WITH LOGO AND NAVBAR -->
+<header class="site-header">
+  <div class="container">
+    <div class="logo-title">
+      <img src="{% static 'images/logo.png' %}" alt="Logo" class="logo">
+      <h1 class="title">Teacher Transfer Request System</h1>
+    </div>
+    <nav class="site-nav">
+      <ul>
+        <li><a href="{% url 'transfers:home' %}">Home</a></li>
+        <li><a href="{% url 'transfers:submit_transfer' %}">Submit Request</a></li>
+        <li><a href="{% url 'transfers:transfer_history' %}">Transfer History</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+{% if messages %}
+  <ul class="messages">
+    {% for message in messages %}
+      <li class="{{ message.tags }}">{{ message }}</li>
+    {% endfor %}
+  </ul>
+{% endif %}
+
+<form method="post" enctype="multipart/form-data">
+  {% csrf_token %}
+  {{ form.non_field_errors }}
+
+  <!-- Personal Information -->
+  <h3>Personal Info</h3>
+  <div class="form-group">
+    {{ form.full_name.label_tag }} {{ form.full_name }}
+  </div>
+  <div class="form-group">
+    {{ form.email.label_tag }} {{ form.email }}
+  </div>
+  <div class="form-group">
+    {{ form.sex.label_tag }} {{ form.sex }}
+  </div>
+  <div class="form-group">
+    {{ form.subject_taught.label_tag }} {{ form.subject_taught }}
+  </div>
+  <div class="form-group">
+    {{ form.teaching_experience.label_tag }} {{ form.teaching_experience }}
+  </div>
+
+  <!-- Current School Information -->
+  <h3>Current School Information</h3>
+  <div class="form-group">
+    {{ form.current_region.label_tag }} {{ form.current_region }}
+  </div>
+  <div class="form-group">
+    {{ form.current_district.label_tag }} {{ form.current_district }}
+  </div>
+  <div class="form-group">
+    {{ form.current_ward.label_tag }} {{ form.current_ward }}
+  </div>
+  <div class="form-group">
+    {{ form.current_school.label_tag }} {{ form.current_school }}
+  </div>
+
+  <!-- Desired School Information -->
+  <h3>Desired School Information</h3>
+  <div class="form-group">
+    {{ form.desired_region.label_tag }} {{ form.desired_region }}
+  </div>
+  <div class="form-group">
+    {{ form.desired_district.label_tag }} {{ form.desired_district }}
+  </div>
+  <div class="form-group">
+    {{ form.desired_ward.label_tag }} {{ form.desired_ward }}
+  </div>
+  <div class="form-group">
+    {{ form.desired_school.label_tag }} {{ form.desired_school }}
+  </div>
+
+  <!-- Reason -->
+  <h3>Reason for Transfer</h3>
+  <div class="form-group">
+    {{ form.reason.label_tag }} {{ form.reason }}
+  </div>
+
+  <!-- Academic Info -->
+  <fieldset class="border p-3 mt-4">
+    <legend class="w-auto"><h4>Academic Information</h4></legend>
+
+    <div class="form-group">
+      {{ form.form_four_index.label_tag }} {{ form.form_four_index }}
+    </div>
+    <div class="form-group">
+      {{ form.form_four_certificate.label_tag }} {{ form.form_four_certificate }}
+    </div>
+
+    <div class="form-group">
+      {{ form.form_six_or_diploma_index.label_tag }} {{ form.form_six_or_diploma_index }}
+    </div>
+    <div class="form-group">
+      {{ form.form_six_or_diploma_certificate.label_tag }} {{ form.form_six_or_diploma_certificate }}
+    </div>
+
+    <div class="form-group">
+      {{ form.university_reg_number.label_tag }} {{ form.university_reg_number }}
+    </div>
+    <div class="form-group">
+      {{ form.university_certificate.label_tag }} {{ form.university_certificate }}
+    </div>
+  </fieldset>
+
+  <button type="submit" class="btn btn-primary mt-4">Submit Request</button>
+</form>
+
+<!-- JavaScript for cascading dropdowns -->
+<script>
+  document.getElementById('id_current_region').addEventListener('change', function () {
+    const region_id = this.value;
+    fetch(`/transfers/districts/?region_id=${region_id}`)
+      .then(res => res.json())
+      .then(data => {
+        const districtSelect = document.getElementById('id_current_district');
+        districtSelect.innerHTML = '';
+        data.districts.forEach(d => {
+          const opt = document.createElement('option');
+          opt.value = d.id;
+          opt.text = d.name;
+          districtSelect.appendChild(opt);
+        });
+      });
+  });
+
+  document.getElementById('id_current_district').addEventListener('change', function () {
+    const district_id = this.value;
+    fetch(`/transfers/wards/?district_id=${district_id}`)
+      .then(res => res.json())
+      .then(data => {
+        const wardSelect = document.getElementById('id_current_ward');
+        wardSelect.innerHTML = '';
+        data.wards.forEach(w => {
+          const opt = document.createElement('option');
+          opt.value = w.id;
+          opt.text = w.name;
+          wardSelect.appendChild(opt);
+        });
+      });
+  });
+
+  document.getElementById('id_current_ward').addEventListener('change', function () {
+    const ward_id = this.value;
+    fetch(`/transfers/schools/?ward_id=${ward_id}`)
+      .then(res => res.json())
+      .then(data => {
+        const schoolSelect = document.getElementById('id_current_school');
+        schoolSelect.innerHTML = '';
+        data.schools.forEach(s => {
+          const opt = document.createElement('option');
+          opt.value = s.id;
+          opt.text = s.name;
+          schoolSelect.appendChild(opt);
+        });
+      });
+  });
+
+  document.getElementById('id_desired_region').addEventListener('change', function () {
+    const region_id = this.value;
+    fetch(`/transfers/districts/?region_id=${region_id}`)
+      .then(res => res.json())
+      .then(data => {
+        const districtSelect = document.getElementById('id_desired_district');
+        districtSelect.innerHTML = '<option value="">---------</option>';
+        data.districts.forEach(d => {
+          const opt = document.createElement('option');
+          opt.value = d.id;
+          opt.text = d.name;
+          districtSelect.appendChild(opt);
+        });
+
+        document.getElementById('id_desired_ward').innerHTML = '<option value="">---------</option>';
+        document.getElementById('id_desired_school').innerHTML = '<option value="">---------</option>';
+      });
+  });
+
+  document.getElementById('id_desired_district').addEventListener('change', function () {
+    const district_id = this.value;
+    fetch(`/transfers/wards/?district_id=${district_id}`)
+      .then(res => res.json())
+      .then(data => {
+        const wardSelect = document.getElementById('id_desired_ward');
+        wardSelect.innerHTML = '<option value="">---------</option>';
+        data.wards.forEach(w => {
+          const opt = document.createElement('option');
+          opt.value = w.id;
+          opt.text = w.name;
+          wardSelect.appendChild(opt);
+        });
+
+        document.getElementById('id_desired_school').innerHTML = '<option value="">---------</option>';
+      });
+  });
+
+  document.getElementById('id_desired_ward').addEventListener('change', function () {
+    const ward_id = this.value;
+    fetch(`/transfers/schools/?ward_id=${ward_id}`)
+      .then(res => res.json())
+      .then(data => {
+        const schoolSelect = document.getElementById('id_desired_school');
+        schoolSelect.innerHTML = '<option value="">---------</option>';
+        data.schools.forEach(s => {
+          const opt = document.createElement('option');
+          opt.value = s.id;
+          opt.text = s.name;
+          schoolSelect.appendChild(opt);
+        });
+      });
+  });
+</script>
+
+</body>
+</html>

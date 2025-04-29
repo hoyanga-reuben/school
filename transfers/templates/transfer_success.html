@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <h2 class="mb-4">Transfer Request Summary</h2>
+
+  <table class="table table-striped table-bordered">
+    <tr>
+      <th>Full Name</th>
+      <td>{{ request_obj.full_name }}</td>
+    </tr>
+    <tr>
+      <th>Current School</th>
+      <td>{{ request_obj.current_school }}</td>
+    </tr>
+    <tr>
+      <th>Desired School</th>
+      <td>{{ request_obj.desired_school }}</td>
+    </tr>
+    <tr>
+      <th>Status</th>
+      <td>{{ request_obj.status|capfirst }}</td>
+    </tr>
+  </table>
+
+  {% if request_obj.status == "Pending" %}
+    <form action="{% url 'transfers:cancel_transfer' request_obj.id %}" method="post" class="mb-3" onsubmit="return confirm('Are you sure you want to cancel this transfer request?');">
+      {% csrf_token %}
+      <button type="submit" class="btn btn-danger">
+        ❌ Cancel This Request
+      </button>
+    </form>
+  {% else %}
+    <p class="text-muted mt-3">This transfer request cannot be cancelled ({{ request_obj.status|capfirst }}).</p>
+  {% endif %}
+
+  <div class="mt-4">
+    <a href="{% url 'transfers:exchange_matches' %}" class="btn btn-primary me-2">
+      🔁 View Exchange Suggestions
+    </a>
+    <a href="{% url 'transfers:submit_transfer' %}" class="btn btn-secondary">
+      📝 Submit Another Request
+    </a>
+  </div>
+{% endblock %}

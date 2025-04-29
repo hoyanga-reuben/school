@@ -1,0 +1,80 @@
+{% extends 'base_generic.html' %}
+{% load static %}
+{% block content %}
+
+<link rel="stylesheet" href="{% static 'css/main_dashboard.css' %}">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+<div class="dashboard-container">
+
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <div class="sidebar-header">
+      <h2>Dashboard</h2>
+    </div>
+    <ul class="sidebar-links">
+      <li><a href="{% url 'transfers:main_dashboard' %}" class="{% if request.path == '/' or request.resolver_match.url_name == 'dashboard' %}active{% endif %}">
+        <i class="fas fa-home"></i> Home</a></li>
+
+      {% if view == 'teacher' %}
+        <li><a href="{% url 'transfers:submit_transfer' %}" class="{% if request.resolver_match.url_name == 'submit_transfer' %}active{% endif %}">
+          <i class="fas fa-exchange-alt"></i> Submit Transfer</a></li>
+        <li><a href="{% url 'transfers:transfer_summary' %}" class="{% if request.resolver_match.url_name == 'transfer_summary' %}active{% endif %}">
+          <i class="fas fa-list"></i> My Transfers</a></li>
+      {% endif %}
+
+      {% if view == 'school_officer' %}
+        <li><a href="{% url 'transfers:school_pending_transfers' %}" class="{% if request.resolver_match.url_name == 'school_pending_transfers' %}active{% endif %}">
+          <i class="fas fa-school"></i> School Transfers</a></li>
+      {% elif view == 'district_officer' %}
+        <li><a href="{% url 'transfers:district_pending_transfers' %}" class="{% if request.resolver_match.url_name == 'district_pending_transfers' %}active{% endif %}">
+          <i class="fas fa-building"></i> District Transfers</a></li>
+      {% elif view == 'tamisemi_officer' %}
+        <li><a href="{% url 'transfers:region_pending_transfers' %}" class="{% if request.resolver_match.url_name == 'region_pending_transfers' %}active{% endif %}">
+          <i class="fas fa-map-marker-alt"></i> Regional Transfers</a></li>
+      {% endif %}
+
+      <li><a href="{% url 'transfers:profile' %}" class="{% if request.resolver_match.url_name == 'profile' %}active{% endif %}">
+        <i class="fas fa-user"></i> Profile</a></li>
+
+      <li><a href="{% url 'logout' %}">
+        <i class="fas fa-sign-out-alt"></i> Logout</a></li>
+    </ul>
+  </div>
+
+  <!-- Main Content -->
+  <div class="main-content">
+    <div class="welcome-message">
+      <h2>
+        Welcome {{ user.get_full_name }}!
+        {% if view == 'teacher' %}
+          to Teacher Dashboard
+        {% elif view == 'school_officer' %}
+          to School Officer Dashboard
+        {% elif view == 'district_officer' %}
+          to District Officer Dashboard
+        {% elif view == 'tamisemi_officer' %}
+          to TAMISEMI Officer Dashboard
+        {% else %}
+          to the System
+        {% endif %}
+      </h2>
+    </div>
+
+    {% block dashboard_content %}
+    <!-- The specific dashboard content will be injected here -->
+    {% endblock %}
+  </div>
+
+</div>
+
+<script>
+  // Highlight active link based on URL (extra backup if needed)
+  document.querySelectorAll('.sidebar-links a').forEach(link => {
+    if (link.href === window.location.href) {
+      link.classList.add('active');
+    }
+  });
+</script>
+
+{% endblock %}

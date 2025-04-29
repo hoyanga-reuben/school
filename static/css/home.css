@@ -1,0 +1,182 @@
+/* ================= General Layout ================= */
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f4f6f8;
+}
+
+/* Header */
+header {
+    background-color: #007bff;
+    color: white;
+    padding: 20px;
+    text-align: center;
+    font-size: 26px;
+    font-weight: bold;
+}
+
+/* Footer */
+footer {
+    background-color: #007bff;
+    color: white;
+    text-align: center;
+    padding: 15px;
+    position: relative;
+    bottom: 0;
+    width: 100%;
+}
+
+/* ================= Sidebar Navigation ================= */
+nav {
+    width: 220px;
+    background-color: #007bff;
+    height: 100vh;
+    position: fixed;
+    top: 0;
+    left: 0;
+    padding-top: 100px; /* space below header */
+    overflow-y: auto;
+}
+
+nav ul {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+}
+
+nav ul li {
+    margin: 8px 0;
+}
+
+nav ul li a {
+    display: block;
+    color: white;
+    text-decoration: none;
+    padding: 14px 20px;
+    font-size: 16px;
+    font-weight: 500;
+    transition: background 0.3s, padding-left 0.3s;
+}
+
+nav ul li a:hover {
+    background-color: #0056b3;
+    border-radius: 8px;
+    padding-left: 28px;
+}
+
+/* Main content moves right to make space for sidebar */
+main {
+    margin-left: 240px;
+    padding: 40px 30px;
+}
+
+/* ================= Content Container ================= */
+.container {
+    max-width: 1100px;
+    margin: 20px auto;
+    padding: 30px;
+    background: #ffffff;
+    border-radius: 16px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+}
+
+/* Page Title */
+.container h2 {
+    font-size: 28px;
+    font-weight: 700;
+    color: #333;
+    margin-bottom: 30px;
+    text-align: center;
+    border-bottom: 2px solid #007bff;
+    padding-bottom: 10px;
+}
+
+/* ================= Table Styling ================= */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+    background-color: #fdfdfd;
+    font-size: 15px;
+    color: #333;
+}
+
+table thead {
+    background: #007bff;
+    color: white;
+    text-transform: uppercase;
+}
+
+table th, table td {
+    padding: 14px 18px;
+    border-bottom: 1px solid #ddd;
+    text-align: left;
+}
+
+table tbody tr:hover {
+    background-color: #f1f9ff;
+    transition: background 0.3s ease;
+}
+
+/* Empty message row */
+table td[colspan="5"] {
+    text-align: center;
+    font-style: italic;
+    padding: 25px 0;
+    color: #888;
+}
+
+/* ================= Action Buttons ================= */
+button.btn-approve, button.btn-reject {
+    padding: 8px 14px;
+    font-size: 14px;
+    font-weight: 600;
+    border-radius: 6px;
+    border: none;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+button.btn-approve {
+    background-color: #28a745;
+    color: white;
+}
+
+button.btn-approve:hover {
+    background-color: #218838;
+}
+
+button.btn-reject {
+    background-color: #dc3545;
+    color: white;
+    margin-left: 5px;
+}
+
+button.btn-reject:hover {
+    background-color: #c82333;
+}
+
+/* ================= Responsive Sidebar ================= */
+@media screen and (max-width: 768px) {
+    nav {
+        width: 100%;
+        height: auto;
+        position: relative;
+        padding-top: 0;
+    }
+
+    nav ul li a {
+        padding: 10px;
+        text-align: center;
+    }
+
+    main {
+        margin: 0;
+        padding: 20px;
+    }
+
+    header {
+        font-size: 22px;
+    }
+}

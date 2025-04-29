@@ -1,0 +1,162 @@
+/* transfer_form.css */
+
+body {
+    background-color: #f8f9fa;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    padding: 30px;
+  }
+  
+  h3, h4, legend {
+    color: #2c3e50;
+    margin-bottom: 10px;
+  }
+  
+  form {
+    background-color: #ffffff;
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    max-width: 850px;
+    margin: auto;
+  }
+  
+  .form-group {
+    margin-bottom: 20px;
+  }
+  
+  label {
+    font-weight: 600;
+    color: #34495e;
+    margin-bottom: 5px;
+    display: block;
+  }
+  
+  input[type="text"],
+  input[type="email"],
+  select,
+  textarea,
+  input[type="file"] {
+    width: 100%;
+    padding: 10px 15px;
+    margin-top: 5px;
+    border: 1px solid #ced4da;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    background-color: #fdfdfd;
+  }
+  
+  input[type="text"]:focus,
+  input[type="email"]:focus,
+  select:focus,
+  textarea:focus {
+    outline: none;
+    border-color: #007bff;
+    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.15);
+  }
+  
+  fieldset {
+    border: 2px dashed #007bff;
+    border-radius: 10px;
+    padding: 20px;
+    margin-top: 25px;
+    background-color: #f1f9ff;
+  }
+  
+  legend {
+    font-size: 1.25rem;
+    padding: 0 10px;
+    font-weight: bold;
+  }
+  
+  button.btn-primary {
+    background-color: #007bff;
+    border: none;
+    padding: 12px 25px;
+    border-radius: 8px;
+    font-size: 1rem;
+    transition: background-color 0.3s ease;
+  }
+  
+  button.btn-primary:hover {
+    background-color: #0056b3;
+  }
+  
+  ul.messages {
+    list-style: none;
+    padding: 0;
+    margin-bottom: 20px;
+  }
+  
+  ul.messages li {
+    padding: 12px 20px;
+    border-radius: 8px;
+    margin-bottom: 10px;
+    font-weight: 500;
+  }
+  
+  ul.messages li.success {
+    background-color: #d4edda;
+    color: #155724;
+  }
+  
+  ul.messages li.error {
+    background-color: #f8d7da;
+    color: #721c24;
+  }
+  body {
+    font-family: 'Segoe UI', sans-serif;
+    background-color: #f5f8fa;
+    margin: 0;
+    padding: 0;
+}
+
+.site-header {
+    background-color: #004085;
+    color: white;
+    padding: 15px 0;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.container {
+    max-width: 1200px;
+    margin: auto;
+    padding: 0 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.logo-title {
+    display: flex;
+    align-items: center;
+}
+
+.logo {
+    width: 60px;
+    height: 60px;
+    margin-right: 15px;
+}
+
+.title {
+    font-size: 24px;
+    margin: 0;
+}
+
+.site-nav ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    gap: 20px;
+}
+
+.site-nav a {
+    color: white;
+    text-decoration: none;
+    font-weight: bold;
+    transition: color 0.3s;
+}
+
+.site-nav a:hover {
+    color: #ffc107;
+}

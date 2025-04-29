@@ -1,0 +1,67 @@
+{% extends "base_generic.html" %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-4">
+  <h2>My Transfer Requests</h2>
+
+  {% if transfer_requests %}
+    <table class="table table-striped mt-3">
+      <thead>
+        <tr>
+          <th>Submitted On</th>
+          <th>Current School</th>
+          <th>Desired School</th>
+          <th>Status</th>
+          <th>Time Left</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for transfer_request in transfer_requests %}
+          <tr>
+            <td>{{ transfer_request.created_at|date:"Y-m-d H:i" }}</td>
+            <td>{{ transfer_request.current_school.name }}</td>
+            <td>{{ transfer_request.desired_school.name }}</td>
+            <td>{{ transfer_request.status }}</td>
+            <td>
+              {% if transfer_request.status == "Pending" and transfer_request.can_cancel %}
+                <span id="countdown-{{ transfer_request.id }}"
+                      class="countdown-timer"
+                      {% if transfer_request.expiration_time %}
+                        data-expiration="{{ transfer_request.expiration_time|date:'c' }}"
+                      {% else %}
+                        data-expiration="N/A"
+                      {% endif %}>
+                  Calculating...
+                </span>
+              {% else %}
+                <span class="text-muted">N/A</span>
+              {% endif %}
+            </td>
+            <td>
+              {% if transfer_request.can_cancel %}
+                <form method="post" action="{% url 'transfers:cancel_transfer' transfer_request.id %}" style="display:inline;">
+                  {% csrf_token %}
+                  <button type="submit" class="btn btn-danger btn-sm"
+                          onclick="return confirm('Are you sure you want to cancel this transfer request?');">
+                    Cancel
+                  </button>
+                </form>
+              {% else %}
+                <span class="text-muted">Not cancelable</span>
+              {% endif %}
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    <p>No transfer requests found.</p>
+  {% endif %}
+</div>
+{% endblock %}
+
+{% block scripts %}
+  <script src="{% static 'js/script.js' %}"></script>
+{% endblock %}

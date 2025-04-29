@@ -1,0 +1,28 @@
+{% extends 'base_generic.html' %}
+
+{% block content %}
+<div class="container d-flex justify-content-center align-items-center vh-100" style="background: linear-gradient(#e0eafc, #cfdef3);">
+    <div class="card shadow-lg p-4" style="width: 400px; border-radius: 20px;">
+        <h3 class="text-center mb-4">Welcome Back</h3>
+
+        <form method="POST">
+            {% csrf_token %}
+            <div class="mb-3">
+                <input type="text" name="username" class="form-control" placeholder="Username" required>
+            </div>
+            <div class="mb-3">
+                <input type="password" name="password" class="form-control" placeholder="Password" required>
+            </div>
+
+            <div class="d-grid gap-2">
+                <button type="submit" class="btn btn-primary">Login</button>
+            </div>
+        </form>
+
+        <div class="mt-3 text-center">
+            <a href="{% url 'password_reset' %}">Forgot Password?</a> <br>
+            <a href="{% url 'transfers:register_teacher' %}">Don't have an account? Sign Up</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

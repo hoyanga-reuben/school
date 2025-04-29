@@ -1,0 +1,84 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block nav %}
+<!-- Navbar collapses for mobile -->
+<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent">
+  <span class="navbar-toggler-icon"></span>
+</button>
+
+<div class="collapse navbar-collapse" id="navbarContent">
+  <ul class="navbar-nav me-auto">
+    <li class="nav-item"><a class="nav-link" href="{% url 'transfers:all_requests' %}">📄 All Transfer Requests</a></li>
+    <li class="nav-item"><a class="nav-link" href="{% url 'transfers:exchange_matches' %}">🔁 Exchange Match</a></li>
+    <li class="nav-item"><a class="nav-link" href="{% url 'transfers:transfer_map' %}">🗺️ Transfer Map</a></li>
+    <li class="nav-item"><a class="nav-link" href="{% url 'transfers:transfer_summary' %}">📋 Transfer Summary</a></li>
+  </ul>
+  <ul class="navbar-nav ms-auto">
+    {% if user.is_authenticated %}
+      <li class="nav-item">
+        <span class="navbar-text me-3">Welcome, {{ user.username }}!</span>
+      </li>
+      <li class="nav-item">
+        <form method="post" action="{% url 'logout' %}">
+          {% csrf_token %}
+          <button class="btn btn-light btn-sm" type="submit">Logout</button>
+        </form>
+      </li>
+    {% else %}
+      <li class="nav-item"><a class="nav-link" href="{% url 'login' %}">Login</a></li>
+    {% endif %}
+  </ul>
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+  <!-- Sidebar -->
+  <div class="col-md-3 mb-4">
+    <div class="list-group">
+      <a href="{% url 'transfers:all_requests' %}" class="list-group-item list-group-item-action">📄 Transfer Requests</a>
+      <a href="{% url 'transfers:exchange_matches' %}" class="list-group-item list-group-item-action">🔁 Exchange Suggestions</a>
+      <a href="{% url 'transfers:transfer_map' %}" class="list-group-item list-group-item-action">🗺️ View Map</a>
+      <a href="{% url 'transfers:transfer_summary' %}" class="list-group-item list-group-item-action">📋 Transfer Summary</a>
+    </div>
+  </div>
+
+  <!-- Main dashboard area -->
+  <div class="col-md-9">
+    <h2 class="mb-4">Dashboard</h2>
+    <div class="row">
+      <!-- Card 1 -->
+      <div class="col-md-4 mb-4">
+        <div class="card border-primary shadow-sm h-100">
+          <div class="card-body">
+            <h5 class="card-title">📄 Transfer Requests</h5>
+            <p class="card-text">Submit and track your transfer applications.</p>
+            <a href="{% url 'transfers:all_requests' %}" class="btn btn-primary btn-sm">View Requests</a>
+          </div>
+        </div>
+      </div>
+      <!-- Card 2 -->
+      <div class="col-md-4 mb-4">
+        <div class="card border-success shadow-sm h-100">
+          <div class="card-body">
+            <h5 class="card-title">🔁 Exchange Matches</h5>
+            <p class="card-text">Check if there's a direct exchange opportunity.</p>
+            <a href="{% url 'transfers:exchange_matches' %}" class="btn btn-success btn-sm">View Matches</a>
+          </div>
+        </div>
+      </div>
+      <!-- Card 3 -->
+      <div class="col-md-4 mb-4">
+        <div class="card border-info shadow-sm h-100">
+          <div class="card-body">
+            <h5 class="card-title">🗺️ Transfer Map</h5>
+            <p class="card-text">See a map of active requests and nearby schools.</p>
+            <a href="{% url 'transfers:transfer_map' %}" class="btn btn-info btn-sm">Open Map</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

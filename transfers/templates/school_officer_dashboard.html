@@ -1,0 +1,21 @@
+<!-- school_officer_dashboard.html -->
+{% extends 'base_generic.html' %}
+
+{% block title %}School Officer Dashboard{% endblock %}
+
+{% block content %}
+  <h2>School Officer Dashboard</h2>
+  
+  {% if transfer_requests %}
+    <ul>
+      {% for transfer in transfer_requests %}
+        <li>
+          <p>{{ transfer.teacher.get_full_name }} - {{ transfer.current_school.name }} → {{ transfer.desired_school.name }}</p>
+          <a href="{% url 'transfers:approve_transfer' transfer.id %}">Approve/Reject</a>
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p>No pending transfer requests.</p>
+  {% endif %}
+{% endblock %}

@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% load static %}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Teacher Transfer System{% endblock %}</title>
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="{% static 'css/home.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+</head>
+<body>
+
+    <!-- Header -->
+    <header>
+        <h1>Teacher Transfer Management System</h1>
+    </header>
+
+    <!-- Sidebar -->
+    <nav>
+        <ul>
+            <li><a href="{% url 'transfers:main_dashboard' %}"><i class="fas fa-home"></i> Home</a></li>
+
+            {% if view == 'teacher' %}
+                <li><a href="{% url 'transfers:submit_transfer' %}"><i class="fas fa-file-alt"></i> Submit Transfer</a></li>
+                <li><a href="{% url 'transfers:transfer_summary' %}"><i class="fas fa-list"></i> My Transfers</a></li>
+            {% elif view == 'school_officer' %}
+                <li><a href="{% url 'transfers:school_pending_transfers' %}"><i class="fas fa-building"></i> School Transfers</a></li>
+            {% elif view == 'district_officer' %}
+                <li><a href="{% url 'transfers:district_pending_transfers' %}"><i class="fas fa-map-marker-alt"></i> District Transfers</a></li>
+            {% elif view == 'tamisemi_officer' %}
+                <li><a href="{% url 'transfers:region_pending_transfers' %}"><i class="fas fa-globe-africa"></i> Regional Transfers</a></li>
+            {% endif %}
+
+            <li><a href="{% url 'transfers:profile' %}"><i class="fas fa-user"></i> Profile</a></li>
+            <li><a href="{% url 'logout' %}"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+        </ul>
+    </nav>
+
+    <!-- Page Content -->
+    <main>
+        {% block content %}
+        {% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <p>&copy; 2025 Teacher Transfer System</p>
+    </footer>
+
+</body>
+</html>
