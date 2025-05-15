@@ -1,0 +1,57 @@
+{% extends 'base_officer.html' %}
+{% load static %}
+
+{% block title %}All Transfers - School{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <!-- Search Input -->
+    <input type="text" id="searchInput" placeholder="Search transfers..." 
+           class="form-control mb-4" style="max-width: 500px; border-radius: 10px;">
+
+    <!-- Transfers Table -->
+    <table id="transfersTable" class="display nowrap" style="width:100%">
+        <thead>
+            <tr>
+                <th>Teacher Name</th>
+                <th>Current School</th>
+                <th>Requested School</th>
+                <th>Status</th>
+                <th>Date Submitted</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% if transfer_requests %}
+                {% for transfer in transfer_requests %}
+                    <tr>
+                        <td>{{ transfer.full_name }}</td>
+                        <td>{{ transfer.current_school.name }}</td>
+                        <td>{{ transfer.desired_school.name }}</td>
+                        <td>{{ transfer.status }}</td>
+                        <td>{{ transfer.created_at|date:"Y-m-d H:i" }}</td>
+                    </tr>
+                {% endfor %}
+            {% else %}
+                <tr>
+                    <td colspan="5" class="text-center">No transfer requests found.</td>
+                </tr>
+            {% endif %}
+        </tbody>
+    </table>
+</div>
+
+<!-- DataTables + SweetAlert -->
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.3/dist/sweetalert2.min.css">
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="{% static 'js/school_all_transfers.js' %}"></script>
+<script id="school-notifications-data" type="application/json">
+    {{ notifications_json|safe }}
+</script>
+<script>
+    const schoolNotifications = JSON.parse(document.getElementById("school-notifications-data").textContent);
+</script>
+
+{% endblock %}

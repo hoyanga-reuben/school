@@ -1,10 +1,26 @@
-{% extends 'transfers/base_generic.html' %}
-
+{% extends 'base_officer.html' %}
 {% block title %}Edit Profile{% endblock %}
 
 {% block content %}
 <div class="container">
     <h2>Edit Profile</h2>
-    <p>This page will allow the user to edit their profile in the future.</p>
+
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <label>Phone Number:</label><br>
+        <input type="text" name="phone_number" value="{{ profile.phone_number }}"><br><br>
+
+        <label>Address:</label><br>
+        <textarea name="address">{{ profile.address }}</textarea><br><br>
+
+        {% if profile.profile_picture %}
+            <img src="{{ profile.profile_picture.url }}" width="120"><br>
+        {% endif %}
+
+        <label>Change Picture:</label><br>
+        <input type="file" name="profile_picture"><br><br>
+
+        <button type="submit">Save Changes</button>
+    </form>
 </div>
 {% endblock %}

@@ -142,6 +142,8 @@ class TeacherProfile(models.Model):
 
     def __str__(self):
         return self.user.get_full_name() or self.user.username
+    
+    
 class SchoolOfficerProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     school = models.ForeignKey('School', on_delete=models.CASCADE)
@@ -197,6 +199,8 @@ class SchoolOfficer(models.Model):
 
     def __str__(self):
         return f"{self.user.get_full_name()} - {self.school.name}"
+    
+
 class DistrictOfficer(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     district = models.ForeignKey(District, on_delete=models.CASCADE)

@@ -13,39 +13,56 @@
 <body>
 
     <!-- Header -->
-    <header>
-        <h1>Teacher Transfer Management System</h1>
+    <header class="navbar">
+        <div class="navbar-left">
+            <img src="{% static 'images/logo.png' %}" alt="Logo" class="navbar-logo">
+            <span class="navbar-title">Teacher Transfer System</span>
+        </div>
+    
+        <input type="checkbox" id="navbar-toggle" class="navbar-toggle">
+        <label for="navbar-toggle" class="navbar-icon">&#9776;</label>
+    
+        <div class="navbar-links">
+            <a href="{% url 'transfers:main_dashboard' %}">Dashboard</a>
+            <a href="{% url 'transfers:profile' %}">Profile</a>
+            <a href="{% url 'transfers:logout' %}">Logout</a>
+            <div class="navbar-user">
+                <img src="{{ user.profile.image.url }}" alt="Profile" class="navbar-user-image"
+                     onerror="this.src=this.dataset.src;" data-src="{% static 'images/default_profile.png' %}">
+                <span>{{ user.get_full_name }} ({{ user.profile.role|capfirst }})</span>
+            </div>
+        </div>
     </header>
 
     <!-- Sidebar -->
-    <nav>
+    <nav class="sidebar">
         <ul>
-            <li><a href="{% url 'transfers:main_dashboard' %}"><i class="fas fa-home"></i> Home</a></li>
+            <li><a href="{% url 'transfers:main_dashboard' %}" class="sidebar-link"><i class="fas fa-home"></i> Home</a></li>
 
             {% if view == 'teacher' %}
-                <li><a href="{% url 'transfers:submit_transfer' %}"><i class="fas fa-file-alt"></i> Submit Transfer</a></li>
-                <li><a href="{% url 'transfers:transfer_summary' %}"><i class="fas fa-list"></i> My Transfers</a></li>
+                <li><a href="{% url 'transfers:submit_transfer' %}" class="sidebar-link"><i class="fas fa-file-alt"></i> Submit Transfer</a></li>
+                <li><a href="{% url 'transfers:transfer_summary' %}" class="sidebar-link"><i class="fas fa-list"></i> My Transfers</a></li>
             {% elif view == 'school_officer' %}
-                <li><a href="{% url 'transfers:school_pending_transfers' %}"><i class="fas fa-building"></i> School Transfers</a></li>
+                <li><a href="{% url 'transfers:school_pending_transfers' %}" class="sidebar-link"><i class="fas fa-building"></i> School Transfers</a></li>
             {% elif view == 'district_officer' %}
-                <li><a href="{% url 'transfers:district_pending_transfers' %}"><i class="fas fa-map-marker-alt"></i> District Transfers</a></li>
+                <li><a href="{% url 'transfers:district_pending_transfers' %}" class="sidebar-link"><i class="fas fa-map-marker-alt"></i> District Transfers</a></li>
             {% elif view == 'tamisemi_officer' %}
-                <li><a href="{% url 'transfers:region_pending_transfers' %}"><i class="fas fa-globe-africa"></i> Regional Transfers</a></li>
+                <li><a href="{% url 'transfers:region_pending_transfers' %}" class="sidebar-link"><i class="fas fa-globe-africa"></i> Regional Transfers</a></li>
             {% endif %}
 
-            <li><a href="{% url 'transfers:profile' %}"><i class="fas fa-user"></i> Profile</a></li>
-            <li><a href="{% url 'logout' %}"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+            <li><a href="{% url 'transfers:profile' %}" class="sidebar-link"><i class="fas fa-user"></i> Profile</a></li>
+            <li><a href="{% url 'transfers:logout' %}" class="sidebar-link"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
         </ul>
     </nav>
 
     <!-- Page Content -->
-    <main>
+    <main class="main-content">
         {% block content %}
         {% endblock %}
     </main>
 
     <!-- Footer -->
-    <footer>
+    <footer class="footer">
         <p>&copy; 2025 Teacher Transfer System</p>
     </footer>
 

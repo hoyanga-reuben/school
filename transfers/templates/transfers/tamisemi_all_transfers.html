@@ -1,0 +1,58 @@
+{% extends 'base_officer.html' %}
+{% load static %}
+
+{% block title %}TAMISEMI Officer - All Transfers{% endblock %}
+
+{% block content %}
+<link rel="stylesheet" href="{% static 'css/officer_dashboard.css' %}">
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.3/dist/sweetalert2.min.css">
+
+<div class="officer-container">
+    <h2>TAMISEMI Officer - All Transfer Requests</h2>
+
+    <div class="officer-toolbar">
+        <input type="text" id="searchInput" placeholder="Search by teacher name...">
+        <button id="darkModeToggle">Toggle Dark Mode</button>
+        <div class="notifications">
+            <button id="notificationBtn">Notifications (<span id="notifCount">0</span>)</button>
+            <div id="notificationDropdown" class="dropdown-content" style="display:none;"></div>
+        </div>
+    </div>
+
+    <table id="transfersTable" class="officer-table display">
+        <thead>
+            <tr>
+                <th>Teacher</th>
+                <th>Current School</th>
+                <th>Desired School</th>
+                <th>Status</th>
+                <th>Date Submitted</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for transfer in transfer_requests %}
+                <tr>
+                    <td>{{ transfer.teacher.full_name|default:transfer.teacher.username }}</td>
+                    <td>{{ transfer.current_school.name|default:"-" }}</td>
+                    <td>{{ transfer.desired_school.name|default:"-" }}</td>
+                    <td>{{ transfer.status }}</td>
+                    <td>{{ transfer.created_at|date:"Y-m-d H:i" }}</td>
+                </tr>
+            {% empty %}
+                <tr><td colspan="5">No transfer requests found.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<!-- Embed notification JSON safely -->
+<script id="notif-data" type="application/json">
+    {{ notifications|json_script:"notif-data" }}
+</script>
+
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="{% static 'js/tamisemi_all_transfers.js' %}"></script>
+{% endblock %}

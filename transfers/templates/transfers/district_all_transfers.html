@@ -1,0 +1,57 @@
+{% extends 'base_officer.html' %}
+{% load static %}
+
+{% block content %}
+<!-- External Stylesheets for DataTables and SweetAlert -->
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.3/dist/sweetalert2.min.css">
+
+<!-- Toolbar -->
+<div class="officer-toolbar">
+    <input type="text" id="searchInput" placeholder="Search transfers..." class="search-input">
+    <button id="darkModeToggle">Toggle Dark Mode</button>
+    <div class="notifications">
+        <button id="notificationBtn">Notifications (<span id="notifCount">0</span>)</button>
+        <div id="notificationDropdown" class="dropdown-content" style="display:none;"></div>
+    </div>
+</div>
+
+<!-- Transfers Table -->
+<table id="transfersTable" class="display" style="width:100%">
+    <thead>
+        <tr>
+            <th>Teacher Name</th>
+            <th>Current School</th>
+            <th>Requested School</th>
+            <th>Status</th>
+            <th>Date Submitted</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% if transfer_requests %}
+            {% for request in transfer_requests %}
+                <tr>
+                    <td>{{ request.full_name }}</td>
+                    <td>{{ request.current_school.name }}</td>
+                    <td>{{ request.desired_school.name }}</td>
+                    <td>{{ request.status }}</td>
+                    <td>{{ request.created_at|date:"Y-m-d H:i" }}</td>
+                </tr>
+            {% endfor %}
+        {% else %}
+            <tr class="no-data"><td colspan="5">No transfer requests available</td></tr>
+        {% endif %}
+    </tbody>
+</table>
+
+<!-- Pass notifications JSON -->
+<script id="notif-data" type="application/json">
+    {{ notifications_json|safe }}
+</script>
+
+<!-- External Scripts -->
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="{% static 'js/district_all_transfers.js' %}"></script>
+{% endblock %}

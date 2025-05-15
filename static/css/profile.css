@@ -1,0 +1,33 @@
+body.dark-mode {
+    background-color: #1e1e2f;
+    color: #f1f1f1;
+}
+
+.card {
+    background-color: #fff;
+    border: none;
+}
+
+.dark-mode .card {
+    background-color: #2d2d3d;
+    color: #ffffff;
+}
+
+.dark-mode .btn {
+    border-color: #ccc;
+    color: #f1f1f1;
+}
+
+.dropdown-menu {
+    background-color: #f8f9fa;
+    border-radius: 0.5rem;
+}
+input.form-control {
+    border-radius: 0.5rem;
+    box-shadow: none;
+}
+
+input.form-control:focus {
+    border-color: #004080;
+    box-shadow: 0 0 0 0.2rem rgba(0, 64, 128, 0.2);
+}

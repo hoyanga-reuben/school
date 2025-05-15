@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% load static %}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Officer Dashboard{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'css/officer_dashboard.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+</head>
+<body>
+
+<!-- Navbar -->
+<header class="navbar">
+    <div class="navbar-left">
+        <img src="{% static 'images/logo.png' %}" alt="Logo" class="navbar-logo">
+        <span class="navbar-title">Teacher Transfer System</span>
+    </div>
+    
+    <div class="navbar-right">
+        <!-- Notifications -->
+        <div class="navbar-notifications">
+            <i class="fas fa-bell"></i>
+        </div>
+
+        <!-- Dark mode toggle -->
+        <button class="dark-mode-toggle" onclick="toggleDarkMode()">
+            <i class="fas fa-moon"></i>
+        </button>
+
+        <!-- User Info -->
+        <div class="navbar-user">
+            {% if user.profile.image %}
+            <img src="{{ user.profile.image.url }}" alt="Profile" class="navbar-user-image"
+                onerror="this.onerror=null;this.src='{{ STATIC_URL }}images/default_profile.png';">
+            
+            {% else %}
+                <img src="{% static 'images/default_profile.png' %}" alt="Default" class="navbar-user-image">
+            {% endif %}
+            <span>{{ user.get_full_name }} ({{ user.profile.role|capfirst }})</span>
+        </div>
+
+        <!-- Quick Links -->
+        <nav class="navbar-links">
+            <a href="{% url 'transfers:main_dashboard' %}">Dashboard</a>
+            <a href="{% url 'transfers:profile' %}">Profile</a>
+            <a href="{% url 'transfers:logout' %}">Logout</a>
+        </nav>
+    </div>
+</header>
+
+<!-- Sidebar -->
+<nav class="sidebar">
+    <ul class="sidebar-links">
+        <li>
+            <a href="{% url 'transfers:main_dashboard' %}" class="{% if request.resolver_match.url_name == 'main_dashboard' %}active{% endif %}">
+                <i class="fas fa-home"></i> <span>Dashboard</span>
+            </a>
+        </li>
+
+        {% if user.profile.role == 'school_officer' %}
+            <li><a href="{% url 'transfers:school_all_transfers' %}" class="{% if request.resolver_match.url_name == 'school_all_transfers' %}active{% endif %}"><i class="fas fa-building"></i> <span>School Transfers</span></a></li>
+        {% elif user.profile.role == 'district_officer' %}
+            <li><a href="{% url 'transfers:district_all_transfers' %}" class="{% if request.resolver_match.url_name == 'district_all_transfers' %}active{% endif %}"><i class="fas fa-city"></i> <span>District Transfers</span></a></li>
+        {% elif user.profile.role == 'tamisemi_officer' %}
+            <li><a href="{% url 'transfers:tamisemi_all_transfers' %}" class="{% if request.resolver_match.url_name == 'tamisemi_all_transfers' %}active{% endif %}"><i class="fas fa-globe-africa"></i> <span>National Transfers</span></a></li>
+        {% endif %}
+
+        <li><a href="{% url 'transfers:profile' %}" class="{% if request.resolver_match.url_name == 'profile' %}active{% endif %}"><i class="fas fa-user"></i> <span>Profile</span></a></li>
+        <li><a href="{% url 'transfers:logout' %}"><i class="fas fa-sign-out-alt"></i> <span>Logout</span></a></li>
+    </ul>
+</nav>
+
+<!-- Page Content -->
+<main class="main-content">
+    {% block content %}
+    {% endblock %}
+</main>
+
+<!-- Footer -->
+<footer class="footer">
+    <p>&copy; 2025 Teacher Transfer System</p>
+</footer>
+
+<!-- Dark Mode Script -->
+<script>
+    function toggleDarkMode() {
+        document.body.classList.toggle('dark-mode');
+    }
+</script>
+
+</body>
+</html>

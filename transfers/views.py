@@ -17,6 +17,8 @@ from .decorators import  check_teacher_transfer_unlock
 from django.contrib.auth import authenticate, login
 from django.http import HttpResponseRedirect
 from django.urls import reverse
+from django.http import HttpResponse
+from django.utils.safestring import mark_safe
 
 def custom_login(request):
     if request.method == 'POST':
@@ -240,7 +242,7 @@ def main_dashboard(request):
     return render(request, 'transfers/main_dashboard.html', context)
 
 
-# ✅ Combined Approval Logic
+# ✅ Combined Approval Logic with Correct Status Updates
 @login_required
 def approve_transfer(request, transfer_id):
     transfer = get_object_or_404(TransferRequest, id=transfer_id)
@@ -254,32 +256,33 @@ def approve_transfer(request, transfer_id):
             if is_school_officer(user):
                 if transfer.status == 'Pending':
                     transfer.school_approval = True
+                    transfer.status = 'Approved by School'
                     approved = True
                 else:
-                    messages.warning(request, "Only pending requests can be approved.")
-            
+                    messages.warning(request, "Only pending requests can be approved by school officers.")
+
             elif is_district_officer(user):
                 if not transfer.school_approval:
-                    messages.warning(request, "School officer must approve before you can approve.")
-                elif transfer.status == 'Pending':
+                    messages.warning(request, "School officer must approve before district approval.")
+                elif transfer.status == 'Approved by School':
                     transfer.district_approval = True
+                    transfer.status = 'Approved by District'
                     approved = True
                 else:
-                    messages.warning(request, "Only pending requests can be approved.")
+                    messages.warning(request, "Only requests approved by school officer can be approved by district.")
 
             elif is_tamisemi_officer(user):
                 if not transfer.district_approval:
-                    messages.warning(request, "District officer must approve before you can approve.")
-                elif transfer.status == 'Pending':
+                    messages.warning(request, "District officer must approve before TAMISEMI approval.")
+                elif transfer.status == 'Approved by District':
                     transfer.tamisemi_approval = True
+                    transfer.status = 'Approved'  # Final approval stage
                     approved = True
                 else:
-                    messages.warning(request, "Only pending requests can be approved.")
+                    messages.warning(request, "Only requests approved by district can be approved by TAMISEMI.")
 
             if approved:
-                messages.success(request, "Transfer approved successfully.")
-                if transfer.school_approval and transfer.district_approval and transfer.tamisemi_approval:
-                    transfer.status = 'Approved'
+                messages.success(request, "Transfer request approved successfully.")
 
         # Reject button clicked
         elif 'reject' in request.POST:
@@ -288,29 +291,29 @@ def approve_transfer(request, transfer_id):
                     transfer.status = 'Rejected'
                     messages.error(request, "Transfer request rejected by school officer.")
                 else:
-                    messages.warning(request, "Only pending requests can be rejected.")
+                    messages.warning(request, "Only pending requests can be rejected by school officers.")
 
             elif is_district_officer(user):
                 if not transfer.school_approval:
-                    messages.warning(request, "School officer must approve before you can reject.")
-                elif transfer.status == 'Pending':
+                    messages.warning(request, "School officer must approve before district rejection.")
+                elif transfer.status == 'Approved by School':
                     transfer.status = 'Rejected'
                     messages.error(request, "Transfer request rejected by district officer.")
                 else:
-                    messages.warning(request, "Only pending requests can be rejected.")
+                    messages.warning(request, "Only requests approved by school officer can be rejected by district.")
 
             elif is_tamisemi_officer(user):
                 if not transfer.district_approval:
-                    messages.warning(request, "District officer must approve before you can reject.")
-                elif transfer.status == 'Pending':
+                    messages.warning(request, "District officer must approve before TAMISEMI rejection.")
+                elif transfer.status == 'Approved by District':
                     transfer.status = 'Rejected'
                     messages.error(request, "Transfer request rejected by TAMISEMI officer.")
                 else:
-                    messages.warning(request, "Only pending requests can be rejected.")
+                    messages.warning(request, "Only requests approved by district can be rejected by TAMISEMI.")
 
         transfer.save()
 
-    # Determine where to redirect back
+    # Redirect logic (you may customize this further)
     if is_school_officer(user):
         back_url = 'transfers:main_dashboard'
     elif is_district_officer(user):
@@ -320,7 +323,10 @@ def approve_transfer(request, transfer_id):
     else:
         back_url = 'transfers:home'
 
-    return render(request, 'approve_transfer.html', {'transfer': transfer, 'back_url': back_url})
+    return render(request, 'approve_transfer.html', {
+        'transfer': transfer,
+        'back_url': back_url
+    })
 
 @login_required
 def transfer_map(request):
@@ -466,24 +472,129 @@ def home(request):
 def transfer_history(request):
     transfer_requests = TransferRequest.objects.filter(teacher=request.user).order_by('-submitted_at')
     return render(request, 'transfer_history.html', {'transfer_requests': transfer_requests})
-   
+  
+@login_required
+def school_all_transfers(request):
+    try:
+        profile = SchoolOfficerProfile.objects.get(user=request.user)
+        school = profile.school
+    except SchoolOfficerProfile.DoesNotExist:
+        return HttpResponse("No School Officer profile found.")
+
+    transfers = TransferRequest.objects.filter(current_school=school)
+
+    # Dummy notifications (you can link this to real notification logic)
+    notifications = [
+        "2 new transfer requests submitted today",
+        "1 pending approval"
+    ]
+
+    return render(request, 'transfers/school_all_transfers.html', {
+        'transfer_requests': transfers,
+        'notifications_json': mark_safe(json.dumps(notifications)),
+    })
+
+
 
 @login_required
-def school_pending_transfers(request):
-    return render(request, 'transfers/school_pending_transfers.html')
+def district_all_transfers(request):
+    try:
+        profile = DistrictOfficerProfile.objects.get(user=request.user)
+        district = profile.district
+    except DistrictOfficerProfile.DoesNotExist:
+        return HttpResponse("No District Officer profile or related data found.")
+
+    transfers = TransferRequest.objects.filter(current_school__ward__district=district)
+
+    # Example dynamic notifications (replace with real logic)
+    notifications = [
+        "4 new district transfer requests",
+        "1 profile edited"
+    ]
+
+    return render(request, 'transfers/district_all_transfers.html', {
+        'transfer_requests': transfers,
+        'notifications_json': mark_safe(json.dumps(notifications))
+    })
+
 @login_required
-def district_pending_transfers(request):
-    return render(request, 'transfers/district_pending_transfers.html')
-@login_required
-def region_pending_transfers(request):
-    return render(request, 'transfers/region_pending_transfers.html')
+def tamisemi_all_transfers(request):
+    try:
+        officer_profile = TamisemiOfficerProfile.objects.get(user=request.user)
+    except TamisemiOfficerProfile.DoesNotExist:
+        return HttpResponse("No TAMISEMI Officer profile found.")
+
+    transfers = TransferRequest.objects.all()
+
+    # Notifications to display
+    notifications = [
+        "5 inter-region transfer requests",
+        "2 officers submitted feedback"
+    ]
+
+    return render(request, 'transfers/tamisemi_all_transfers.html', {
+        'transfer_requests': transfers,
+        'notifications': notifications
+    })
+
 @login_required
 def profile_view(request):
     return render(request, 'transfers/profile.html')
+
+# views.py
+
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import render
+from .utils import get_user_profile
+
 @login_required
 def edit_profile(request):
-    # For now, just render a basic page (later you can add a form)
-    return render(request, 'transfers/edit_profile.html')
+    profile = get_user_profile(request.user)
+    if profile is None:
+        return render(request, 'transfers/error.html', {'message': 'Profile not found for this user.'})
+    
+    return render(request, 'transfers/edit_profile.html', {'profile': profile})
 
+@login_required
+def reject_transfer(request, transfer_id):
+    transfer = get_object_or_404(TransferRequest, id=transfer_id)
 
+    # Optional: check permissions based on user group
+    user_groups = request.user.groups.values_list('name', flat=True)
+
+    if 'school_officer' in user_groups:
+        # Example: Only allow rejection if transfer is still pending at school level
+        if transfer.status != 'Pending':
+            messages.warning(request, "Only pending requests can be rejected.")
+            return redirect('transfers:school_pending_transfers')
+        transfer.status = 'Rejected by School Officer'
+
+    elif 'district_officer' in user_groups:
+        if transfer.status != 'Approved by School Officer':
+            messages.warning(request, "Only school-approved requests can be rejected by district.")
+            return redirect('transfers:district_pending_transfers')
+        transfer.status = 'Rejected by District Officer'
+
+    elif 'tamisemi_officer' in user_groups:
+        if transfer.status != 'Approved by District Officer':
+            messages.warning(request, "Only district-approved requests can be rejected by TAMISEMI.")
+            return redirect('transfers:region_pending_transfers')
+        transfer.status = 'Rejected by TAMISEMI'
+
+    else:
+        messages.error(request, "You are not authorized to reject this transfer.")
+        return redirect('transfers:main_dashboard')
+
+    transfer.save()
+    messages.success(request, f"Transfer request for {transfer.teacher.get_full_name()} has been rejected.")
+    
+    # Redirect to appropriate dashboard
+    if 'school_officer' in user_groups:
+        return redirect('transfers:school_pending_transfers')
+    elif 'district_officer' in user_groups:
+        return redirect('transfers:district_pending_transfers')
+    elif 'tamisemi_officer' in user_groups:
+        return redirect('transfers:region_pending_transfers')
+    else:
+        return redirect('transfers:main_dashboard')
 

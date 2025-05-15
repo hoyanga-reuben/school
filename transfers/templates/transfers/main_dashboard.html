@@ -4,6 +4,7 @@
 
 <link rel="stylesheet" href="{% static 'css/main_dashboard.css' %}">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css">
 
 <div class="dashboard-container">
 
@@ -24,20 +25,20 @@
       {% endif %}
 
       {% if view == 'school_officer' %}
-        <li><a href="{% url 'transfers:school_pending_transfers' %}" class="{% if request.resolver_match.url_name == 'school_pending_transfers' %}active{% endif %}">
+        <li><a href="{% url 'transfers:school_all_transfers' %}" class="{% if request.resolver_match.url_name == 'school_pending_transfers' %}active{% endif %}">
           <i class="fas fa-school"></i> School Transfers</a></li>
       {% elif view == 'district_officer' %}
-        <li><a href="{% url 'transfers:district_pending_transfers' %}" class="{% if request.resolver_match.url_name == 'district_pending_transfers' %}active{% endif %}">
+        <li><a href="{% url 'transfers:district_all_transfers' %}" class="{% if request.resolver_match.url_name == 'district_pending_transfers' %}active{% endif %}">
           <i class="fas fa-building"></i> District Transfers</a></li>
       {% elif view == 'tamisemi_officer' %}
-        <li><a href="{% url 'transfers:region_pending_transfers' %}" class="{% if request.resolver_match.url_name == 'region_pending_transfers' %}active{% endif %}">
+        <li><a href="{% url 'transfers:tamisemi_all_transfers' %}" class="{% if request.resolver_match.url_name == 'region_pending_transfers' %}active{% endif %}">
           <i class="fas fa-map-marker-alt"></i> Regional Transfers</a></li>
       {% endif %}
 
       <li><a href="{% url 'transfers:profile' %}" class="{% if request.resolver_match.url_name == 'profile' %}active{% endif %}">
         <i class="fas fa-user"></i> Profile</a></li>
 
-      <li><a href="{% url 'logout' %}">
+      <li><a href="{% url 'transfers:logout' %}">
         <i class="fas fa-sign-out-alt"></i> Logout</a></li>
     </ul>
   </div>
@@ -61,19 +62,107 @@
       </h2>
     </div>
 
+    {% if view in 'school_officer district_officer tamisemi_officer' %}
+      <div class="toolbar">
+        <input type="text" id="searchInput" placeholder="Search teacher name..." class="search-bar">
+        <button id="darkModeToggle" class="dark-mode-btn">Toggle Dark Mode</button>
+        <div class="notifications">
+          <button id="notificationBtn">Notifications (<span id="notifCount">0</span>)</button>
+          <div id="notificationDropdown" class="dropdown-content" style="display:none;"></div>
+        </div>
+      </div>
+    {% endif %}
+
+    {% if view == 'school_officer' %}
+      <h3>Pending Transfers for Your School</h3>
+    {% elif view == 'district_officer' %}
+      <h3>Transfers Approved by School (Pending District Decision)</h3>
+    {% elif view == 'tamisemi_officer' %}
+      <h3>Transfers Approved by District (Pending Regional Decision)</h3>
+    {% endif %}
+
+    {% if view in 'school_officer district_officer tamisemi_officer' %}
+      <table id="transfersTable" class="display">
+        <thead>
+          <tr>
+            <th>Teacher</th>
+            <th>Current School</th>
+            <th>Desired School</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for transfer in transfer_requests %}
+            {% if view == 'school_officer' %}
+              {% if transfer.status == 'Pending' %}
+                <tr>
+                  <td>{{ transfer.teacher.get_full_name|default:transfer.teacher.username }}</td>
+                  <td>{{ transfer.current_school.name|default:"-" }}</td>
+                  <td>{{ transfer.desired_school.name|default:"-" }}</td>
+                  <td>{{ transfer.status }}</td>
+                  <td>
+                    <a href="{% url 'transfers:approve_transfer' transfer.id %}" class="btn-approve">Approve</a>
+                    <a href="{% url 'transfers:reject_transfer' transfer.id %}" class="btn-reject">Reject</a>
+                  </td>
+                </tr>
+              {% endif %}
+            {% elif view == 'district_officer' %}
+              {% if transfer.status == 'Approved by School' %}
+                <tr>
+                  <td>{{ transfer.teacher.get_full_name|default:transfer.teacher.username }}</td>
+                  <td>{{ transfer.current_school.name|default:"-" }}</td>
+                  <td>{{ transfer.desired_school.name|default:"-" }}</td>
+                  <td>{{ transfer.status }}</td>
+                  <td>
+                    <a href="{% url 'transfers:approve_transfer' transfer.id %}" class="btn-approve">Approve</a>
+                    <a href="{% url 'transfers:reject_transfer' transfer.id %}" class="btn-reject">Reject</a>
+                  </td>
+                </tr>
+              {% endif %}
+            {% elif view == 'tamisemi_officer' %}
+              {% if transfer.status == 'Approved by District' %}
+                <tr>
+                  <td>{{ transfer.teacher.get_full_name|default:transfer.teacher.username }}</td>
+                  <td>{{ transfer.current_school.name|default:"-" }}</td>
+                  <td>{{ transfer.desired_school.name|default:"-" }}</td>
+                  <td>{{ transfer.status }}</td>
+                  <td>
+                    <a href="{% url 'transfers:approve_transfer' transfer.id %}" class="btn-approve">Approve</a>
+                    <a href="{% url 'transfers:reject_transfer' transfer.id %}" class="btn-reject">Reject</a>
+                  </td>
+                </tr>
+              {% endif %}
+            {% endif %}
+          {% empty %}
+            <tr><td colspan="5">No pending transfer requests.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    {% endif %}
+
     {% block dashboard_content %}
-    <!-- The specific dashboard content will be injected here -->
+    <!-- Specific dashboard content goes here -->
     {% endblock %}
+
   </div>
 
 </div>
 
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="{% static 'js/officer_dashboard.js' %}"></script>
+
 <script>
-  // Highlight active link based on URL (extra backup if needed)
-  document.querySelectorAll('.sidebar-links a').forEach(link => {
-    if (link.href === window.location.href) {
-      link.classList.add('active');
-    }
+  $(document).ready(function () {
+    $('#transfersTable').DataTable();
+
+    document.querySelectorAll('.sidebar-links a').forEach(link => {
+      if (link.href === window.location.href) {
+        link.classList.add('active');
+      }
+    });
   });
 </script>
 
