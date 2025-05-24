@@ -1,0 +1,162 @@
+<!-- templates/base_registration.html -->
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Teacher Transfer Registration{% endblock %}</title>
+
+    <link rel="stylesheet" href="{% static 'css/home.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f7f9fc;
+            margin: 0;
+            padding: 0;
+        }
+
+        header {
+            background-color: #144272;
+            color: white;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        header .logo {
+            display: flex;
+            align-items: center;
+        }
+
+        header .logo img {
+            height: 50px;
+            margin-right: 15px;
+        }
+
+        header .system-name {
+            font-size: 22px;
+            font-weight: bold;
+        }
+
+        .form-container {
+            max-width: 600px;
+            margin: 60px auto;
+            padding: 40px;
+            background: white;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            border-radius: 12px;
+        }
+
+        h2 {
+            text-align: center;
+            margin-bottom: 25px;
+            color: #144272;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+        }
+
+        form input, form select, form textarea {
+            margin-bottom: 15px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            font-size: 16px;
+        }
+
+        button {
+            background-color: #144272;
+            color: white;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #205295;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 15px 0;
+            background-color: #eaeaea;
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            font-size: 14px;
+        }
+
+        .registration-wrapper {
+            display: flex;
+            gap: 40px;
+            justify-content: center;
+            align-items: flex-start;
+            margin-top: 40px;
+            padding: 0 20px;
+        }
+
+        .info-sidebar {
+            flex: 1;
+            max-width: 400px;
+            background-color: #f1f4f9;
+            padding: 25px;
+            border-radius: 10px;
+            font-size: 15px;
+            color: #333;
+            box-shadow: 0 0 8px rgba(0, 0, 0, 0.08);
+        }
+
+        .info-sidebar h3 {
+            color: #144272;
+            margin-bottom: 15px;
+        }
+
+        .info-sidebar ul {
+            list-style: disc inside;
+            padding-left: 0;
+        }
+
+        .info-sidebar ul.nested {
+            list-style: circle inside;
+            margin-left: 15px;
+            margin-top: 5px;
+        }
+
+        .flash-message {
+            background-color: #e0f0ff;
+            color: #144272;
+            padding: 12px;
+            margin: 20px auto;
+            max-width: 600px;
+            text-align: center;
+            border-radius: 8px;
+            box-shadow: 0 0 5px rgba(0,0,0,0.05);
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="logo">
+            <img src="{% static 'images/logo.png' %}" alt="Ministry Logo">
+            <span class="system-name">Teacher Transfer Management System</span>
+        </div>
+        <div class="header-icons">
+            <i class="fas fa-user-plus"></i>
+        </div>
+    </header>
+
+    {% block content %}{% endblock %}
+
+    <div class="footer">
+        &copy; 2025 Teacher Transfer System — Ministry of Education
+    </div>
+</body>
+</html>

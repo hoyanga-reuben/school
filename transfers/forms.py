@@ -43,6 +43,14 @@ class TeacherRegistrationForm(UserCreationForm):
             'phone_number', 'address', 'profile_picture',
             'role', 'school', 'district', 'region'
         ]
+
+    def __init__(self, *args, **kwargs):
+        super(TeacherRegistrationForm, self).__init__(*args, **kwargs)
+
+        # Hide Django's default help texts
+        for field_name in ['username', 'password1', 'password2']:
+            self.fields[field_name].help_text = None
+
     def save(self, commit=True):
         user = super().save(commit=False)
         if commit:
@@ -57,45 +65,22 @@ class TeacherRegistrationForm(UserCreationForm):
             district = self.cleaned_data.get('district')
             region = self.cleaned_data.get('region')
 
-            # Create the appropriate profile based on the selected role
             profile = self.create_profile(user, role, phone, address, picture, school, district, region)
             profile.save()
 
         return user
 
     def create_profile(self, user, role, phone, address, picture, school, district, region):
-        """Helper method to create the correct profile based on the role."""
         if role == 'Teacher':
-            return TeacherProfile(
-                user=user,
-                phone_number=phone,
-                address=address,
-                profile_picture=picture,
-                school=school,
-            )
+            return TeacherProfile(user=user, phone_number=phone, address=address, profile_picture=picture, school=school)
         elif role == 'School Officer':
-            return SchoolOfficerProfile(
-                user=user,
-                phone_number=phone,
-                address=address,
-                school=school,
-            )
+            return SchoolOfficerProfile(user=user, phone_number=phone, address=address, school=school)
         elif role == 'District Officer':
-            return DistrictOfficerProfile(
-                user=user,
-                phone_number=phone,
-                address=address,
-                district=district,
-            )
+            return DistrictOfficerProfile(user=user, phone_number=phone, address=address, district=district)
         elif role == 'TAMISEMI Officer':
-            return TamisemiOfficerProfile(
-                user=user,
-                phone_number=phone,
-                address=address,
-                region=region,
-            )
-
+            return TamisemiOfficerProfile(user=user, phone_number=phone, address=address, region=region)
         return user
+
 
 # -------------------------
 # Transfer Request Form

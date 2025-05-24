@@ -16,7 +16,7 @@
         <img src="{% static 'images/logo.png' %}" alt="Logo" class="navbar-logo">
         <span class="navbar-title">Teacher Transfer System</span>
     </div>
-    
+
     <div class="navbar-right">
         <!-- Notifications -->
         <div class="navbar-notifications">
@@ -32,10 +32,9 @@
         <div class="navbar-user">
             {% if user.profile.image %}
             <img src="{{ user.profile.image.url }}" alt="Profile" class="navbar-user-image"
-                onerror="this.onerror=null;this.src='{{ STATIC_URL }}images/default_profile.png';">
-            
+                 onerror="this.onerror=null;this.src='{{ STATIC_URL }}images/default_profile.png';">
             {% else %}
-                <img src="{% static 'images/default_profile.png' %}" alt="Default" class="navbar-user-image">
+            <img src="{% static 'images/default_profile.png' %}" alt="Default" class="navbar-user-image">
             {% endif %}
             <span>{{ user.get_full_name }} ({{ user.profile.role|capfirst }})</span>
         </div>
@@ -49,33 +48,38 @@
     </div>
 </header>
 
-<!-- Sidebar -->
-<nav class="sidebar">
-    <ul class="sidebar-links">
-        <li>
-            <a href="{% url 'transfers:main_dashboard' %}" class="{% if request.resolver_match.url_name == 'main_dashboard' %}active{% endif %}">
-                <i class="fas fa-home"></i> <span>Dashboard</span>
-            </a>
-        </li>
+<!-- Main wrapper to separate sidebar and main content clearly -->
+<div class="dashboard-wrapper">
 
-        {% if user.profile.role == 'school_officer' %}
-            <li><a href="{% url 'transfers:school_all_transfers' %}" class="{% if request.resolver_match.url_name == 'school_all_transfers' %}active{% endif %}"><i class="fas fa-building"></i> <span>School Transfers</span></a></li>
-        {% elif user.profile.role == 'district_officer' %}
-            <li><a href="{% url 'transfers:district_all_transfers' %}" class="{% if request.resolver_match.url_name == 'district_all_transfers' %}active{% endif %}"><i class="fas fa-city"></i> <span>District Transfers</span></a></li>
-        {% elif user.profile.role == 'tamisemi_officer' %}
-            <li><a href="{% url 'transfers:tamisemi_all_transfers' %}" class="{% if request.resolver_match.url_name == 'tamisemi_all_transfers' %}active{% endif %}"><i class="fas fa-globe-africa"></i> <span>National Transfers</span></a></li>
-        {% endif %}
+    <!-- Sidebar -->
+    <nav class="sidebar">
+        <ul class="sidebar-links">
+            <li>
+                <a href="{% url 'transfers:main_dashboard' %}" class="{% if request.resolver_match.url_name == 'main_dashboard' %}active{% endif %}">
+                    <i class="fas fa-home"></i> <span>Dashboard</span>
+                </a>
+            </li>
 
-        <li><a href="{% url 'transfers:profile' %}" class="{% if request.resolver_match.url_name == 'profile' %}active{% endif %}"><i class="fas fa-user"></i> <span>Profile</span></a></li>
-        <li><a href="{% url 'transfers:logout' %}"><i class="fas fa-sign-out-alt"></i> <span>Logout</span></a></li>
-    </ul>
-</nav>
+            {% if user.profile.role == 'school_officer' %}
+                <li><a href="{% url 'transfers:school_all_transfers' %}" class="{% if request.resolver_match.url_name == 'school_all_transfers' %}active{% endif %}"><i class="fas fa-building"></i> <span>School Transfers</span></a></li>
+            {% elif user.profile.role == 'district_officer' %}
+                <li><a href="{% url 'transfers:district_all_transfers' %}" class="{% if request.resolver_match.url_name == 'district_all_transfers' %}active{% endif %}"><i class="fas fa-city"></i> <span>District Transfers</span></a></li>
+            {% elif user.profile.role == 'tamisemi_officer' %}
+                <li><a href="{% url 'transfers:tamisemi_all_transfers' %}" class="{% if request.resolver_match.url_name == 'tamisemi_all_transfers' %}active{% endif %}"><i class="fas fa-globe-africa"></i> <span>National Transfers</span></a></li>
+            {% endif %}
 
-<!-- Page Content -->
-<main class="main-content">
-    {% block content %}
-    {% endblock %}
-</main>
+            <li><a href="{% url 'transfers:profile' %}" class="{% if request.resolver_match.url_name == 'profile' %}active{% endif %}"><i class="fas fa-user"></i> <span>Profile</span></a></li>
+            <li><a href="{% url 'transfers:logout' %}"><i class="fas fa-sign-out-alt"></i> <span>Logout</span></a></li>
+        </ul>
+    </nav>
+
+    <!-- Page Content -->
+    <main class="main-content">
+        {% block content %}
+        {% endblock %}
+    </main>
+
+</div>
 
 <!-- Footer -->
 <footer class="footer">
@@ -91,3 +95,4 @@
 
 </body>
 </html>
+"

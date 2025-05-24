@@ -58,7 +58,8 @@ STATICFILES_DIRS = [
 ]
 
 LOGIN_URL = 'login'
-LOGIN_REDIRECT_URL = '/transfers/redirect/'
+#LOGIN_REDIRECT_URL = '/transfers/redirect/'
+LOGIN_REDIRECT_URL = '/transfers/home/'
 ACCOUNT_INACTIVE_MESSAGE = "Your account is awaiting approval by an administrator."
 
 
