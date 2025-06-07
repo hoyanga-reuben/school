@@ -52,6 +52,21 @@
                 {% endif %}
               </h5>
               <a href="{% url 'transfers:main_dashboard' %}" class="btn btn-outline-success btn-sm mt-2">Go to Dashboard</a>
+              {% if group.name == 'teacher' %}
+  <a href="{% url 'transfers:submit_transfer' %}" class="btn btn-primary btn-sm mt-2">Submit Transfer</a>
+  <a href="{% url 'transfers:transfer_summary' %}" class="btn btn-secondary btn-sm mt-2">My Transfer History</a>
+
+{% elif group.name == 'school_officer' %}
+  <a href="{% url 'transfers:incoming_transfers' %}" class="btn btn-success btn-sm mt-2">Incoming to My School</a>
+  <a href="{% url 'transfers:outgoing_transfers' %}" class="btn btn-warning btn-sm mt-2">Teachers Leaving My School</a>
+
+{% elif group.name == 'district_officer' %}
+  <a href="{% url 'transfers:district_transfers' %}" class="btn btn-info btn-sm mt-2">Transfers in My District</a>
+
+{% elif group.name == 'tamisemi_officer' %}
+  <a href="{% url 'transfers:inter_region_transfers' %}" class="btn btn-dark btn-sm mt-2">Inter-Region Transfers</a>
+{% endif %}
+
             </div>
           </div>
         </div>

@@ -19,6 +19,7 @@ from django.http import HttpResponseRedirect
 from django.urls import reverse
 from django.http import HttpResponse
 from django.utils.safestring import mark_safe
+from django.contrib.auth.models import User
 
 def custom_login(request):
     if request.method == 'POST':
@@ -598,3 +599,84 @@ def reject_transfer(request, transfer_id):
     else:
         return redirect('transfers:main_dashboard')
 
+
+
+
+def is_school_officer(user):
+    return user.groups.filter(name='school_officer').exists()
+
+def is_district_officer(user):
+    return user.groups.filter(name='district_officer').exists()
+
+def is_tamisemi_officer(user):
+    return user.groups.filter(name='tamisemi_officer').exists()
+
+@login_required
+@user_passes_test(lambda u: u.groups.filter(name='school_officer').exists())
+def incoming_transfers(request):
+    try:
+        officer_profile = SchoolOfficerProfile.objects.get(user=request.user)
+        school = officer_profile.school
+        transfers = TransferRequest.objects.filter(desired_school=school)
+    except SchoolOfficerProfile.DoesNotExist:
+        messages.warning(request, "You are not assigned to any school.")
+        transfers = []
+    return render(request, 'transfers/incoming.html', {'transfers': transfers})
+
+
+@login_required
+@user_passes_test(lambda u: u.groups.filter(name='school_officer').exists())
+def outgoing_transfers(request):
+    try:
+        officer_profile = SchoolOfficerProfile.objects.get(user=request.user)
+        school = officer_profile.school
+        transfers = TransferRequest.objects.filter(current_school=school)
+    except SchoolOfficerProfile.DoesNotExist:
+        messages.warning(request, "You are not assigned to any school.")
+        transfers = []
+    return render(request, 'transfers/outgoing.html', {'transfers': transfers})
+
+
+@login_required
+@user_passes_test(is_district_officer)
+def district_transfers(request):
+    # Assuming you have a DistrictOfficerProfile model linking user to district
+    try:
+        officer_profile = DistrictOfficerProfile.objects.get(user=request.user)
+        district = officer_profile.district
+        incoming = TransferRequest.objects.filter(desired_district=district)
+        outgoing = TransferRequest.objects.filter(current_district=district)
+    except DistrictOfficerProfile.DoesNotExist:
+        messages.warning(request, "You are not assigned to any district.")
+        incoming = []
+        outgoing = []
+
+    return render(request, 'transfers/district_transfers.html', {'incoming': incoming, 'outgoing': outgoing})
+
+
+@login_required
+@user_passes_test(is_tamisemi_officer)
+def inter_region_transfers(request):
+    try:
+        officer_profile = TamisemiOfficerProfile.objects.get(user=request.user)
+        region = officer_profile.region
+        incoming = TransferRequest.objects.filter(desired_region=region)
+        outgoing = TransferRequest.objects.filter(current_region=region)
+    except TamisemiOfficerProfile.DoesNotExist:
+        messages.warning(request, "You are not assigned to any region.")
+        incoming = []
+        outgoing = []
+
+    return render(request, 'transfers/inter_region_transfers.html', {'incoming': incoming, 'outgoing': outgoing})
+
+
+def all_users_api(request):
+    users = User.objects.all().values('id', 'username', 'first_name', 'last_name')
+    data = [
+        {
+            'id': u['id'],
+            'full_name': f"{u['first_name']} {u['last_name']}".strip() or u['username']
+        }
+        for u in users
+    ]
+    return JsonResponse(data, safe=False)

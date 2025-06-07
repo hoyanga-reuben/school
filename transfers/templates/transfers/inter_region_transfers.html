@@ -1,0 +1,56 @@
+{% extends 'base_generic.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-5">
+  <h2 class="mb-4 text-dark">Inter-Region Transfer Requests</h2>
+
+  <div class="table-responsive">
+    <table id="interRegionTable" class="table table-bordered table-striped">
+      <thead class="table-dark">
+        <tr>
+          <th>Teacher</th>
+          <th>Subject</th>
+          <th>From Region</th>
+          <th>To Region</th>
+          <th>Status</th>
+          <th>Reason</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for transfer in transfers %}
+        <tr>
+          <td>{{ transfer.teacher.get_full_name }}</td>
+          <td>{{ transfer.subject_taught }}</td>
+          <td>{{ transfer.current_school.ward.district.region.name }}</td>
+          <td>{{ transfer.desired_school.ward.district.region.name }}</td>
+          <td>
+            <span class="badge 
+              {% if transfer.status == 'Pending' %}bg-warning
+              {% elif transfer.status == 'Approved' %}bg-success
+              {% elif transfer.status == 'Rejected' %}bg-danger
+              {% else %}bg-secondary{% endif %}">
+              {{ transfer.status }}
+            </span>
+          </td>
+          <td>{{ transfer.reason }}</td>
+        </tr>
+        {% empty %}
+        <tr>
+          <td colspan="6" class="text-center text-muted">No inter-region transfer requests found.</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<script>
+  $(document).ready(function () {
+    $('#interRegionTable').DataTable({
+      "pageLength": 10,
+      "responsive": true
+    });
+  });
+</script>
+{% endblock %}

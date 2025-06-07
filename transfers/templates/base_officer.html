@@ -93,6 +93,19 @@
     }
 </script>
 
+<script>
+    const socket = new WebSocket(
+      'ws://' + window.location.host + '/ws/online-status/'
+    );
+  
+    socket.onmessage = function (e) {
+      const data = JSON.parse(e.data);
+      console.log("Online user IDs:", data.online_users);
+  
+      // OPTIONAL: You can update icons or badges in the UI here
+    };
+  </script>
+
 </body>
 </html>
 "

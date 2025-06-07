@@ -17,6 +17,7 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path,include
 from django.contrib.auth import views as auth_views
+from transfers.views import all_users_api
 
 urlpatterns = [
     path('login/', auth_views.LoginView.as_view(template_name='login.html'), name='login'),
@@ -27,4 +28,5 @@ urlpatterns = [
     path('reset/done/', auth_views.PasswordResetCompleteView.as_view(), name='password_reset_complete'),
     path('transfers/', include('transfers.urls', namespace='transfers')),
     path('admin/', admin.site.urls),
+    path('api/all-users/', all_users_api),
 ]

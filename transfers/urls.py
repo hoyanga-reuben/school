@@ -1,6 +1,8 @@
 from django.urls import path
 from django.contrib.auth.views import LogoutView 
 from django.contrib.auth import views as auth_views
+from .views import all_users_api
+
 
 from . import views  
 from .views import custom_login
@@ -8,6 +10,7 @@ from .views import custom_login
 app_name = 'transfers'
 
 urlpatterns = [
+     
     path('home/', views.home, name='home'),
     path('login/', custom_login, name='login'), 
     path('dashboard/', views.main_dashboard, name='main_dashboard'),
@@ -40,4 +43,10 @@ urlpatterns = [
     path('password_reset/done/', auth_views.PasswordResetDoneView.as_view(), name='password_reset_done'),
     path('reset/<uidb64>/<token>/', auth_views.PasswordResetConfirmView.as_view(), name='password_reset_confirm'),
     path('reset/done/', auth_views.PasswordResetCompleteView.as_view(), name='password_reset_complete'),
+
+    path('incoming/', views.incoming_transfers, name='incoming_transfers'),
+    path('outgoing/', views.outgoing_transfers, name='outgoing_transfers'),
+    path('district/', views.district_transfers, name='district_transfers'),
+    path('inter-region/', views.inter_region_transfers, name='inter_region_transfers'),
+
 ]

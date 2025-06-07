@@ -1,0 +1,57 @@
+{% extends 'base_generic.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-5">
+  <h2 class="mb-4 text-info">Transfers Within My District</h2>
+
+  <div class="table-responsive">
+    <table id="districtTable" class="table table-hover table-bordered">
+      <thead class="table-info">
+        <tr>
+          <th>Teacher</th>
+          <th>Subject</th>
+          <th>From School</th>
+          <th>To School</th>
+          <th>Status</th>
+          <th>Reason</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for transfer in transfers %}
+        <tr>
+          <td>{{ transfer.teacher.get_full_name }}</td>
+          <td>{{ transfer.subject_taught }}</td>
+          <td>{{ transfer.current_school.name }}</td>
+          <td>{{ transfer.desired_school.name }}</td>
+          <td>
+            <span class="badge 
+              {% if transfer.status == 'Pending' %}bg-warning
+              {% elif transfer.status == 'Approved' %}bg-success
+              {% elif transfer.status == 'Rejected' %}bg-danger
+              {% else %}bg-secondary{% endif %}">
+              {{ transfer.status }}
+            </span>
+          </td>
+          <td>{{ transfer.reason }}</td>
+        </tr>
+        {% empty %}
+        <tr>
+          <td colspan="6" class="text-center text-muted">No district-level transfer requests.</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<script>
+  $(document).ready(function () {
+    $('#districtTable').DataTable({
+      "pageLength": 10,
+      "order": [[0, "asc"]],
+      "responsive": true
+    });
+  });
+</script>
+{% endblock %}

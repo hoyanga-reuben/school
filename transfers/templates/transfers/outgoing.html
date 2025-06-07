@@ -1,0 +1,57 @@
+{% extends 'base_generic.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-5">
+  <h2 class="mb-4 text-warning">Teachers Requesting to Leave My School</h2>
+
+  <div class="table-responsive">
+    <table id="outgoingTable" class="table table-bordered table-hover">
+      <thead class="table-warning">
+        <tr>
+          <th>Teacher Name</th>
+          <th>Subject</th>
+          <th>To School</th>
+          <th>Experience (Years)</th>
+          <th>Status</th>
+          <th>Reason</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for transfer in transfers %}
+        <tr>
+          <td>{{ transfer.teacher.get_full_name }}</td>
+          <td>{{ transfer.subject_taught }}</td>
+          <td>{{ transfer.desired_school.name }}</td>
+          <td>{{ transfer.teaching_experience }}</td>
+          <td>
+            <span class="badge {% if transfer.status == 'Pending' %}bg-warning
+                                 {% elif transfer.status == 'Approved' %}bg-success
+                                 {% elif transfer.status == 'Rejected' %}bg-danger
+                                 {% else %}bg-secondary{% endif %}">
+              {{ transfer.status }}
+            </span>
+          </td>
+          <td>{{ transfer.reason }}</td>
+        </tr>
+        {% empty %}
+        <tr>
+          <td colspan="6" class="text-center text-muted">No outgoing transfer requests found.</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Include DataTables JS -->
+<script>
+  $(document).ready(function () {
+    $('#outgoingTable').DataTable({
+      "pageLength": 10,
+      "order": [[0, "asc"]],
+      "responsive": true
+    });
+  });
+</script>
+{% endblock %}

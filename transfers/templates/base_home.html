@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <title>Teacher Transfer System</title>
     {% load static %}
-    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <!--<link rel="stylesheet" href="{% static 'css/style.css' %}">-->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -17,17 +17,17 @@
             position: fixed;
             width: 100%;
             z-index: 1030;
-            top:0px;
+            top: 0;
         }
         .sidebar {
-            height: calc(100vh - 60px); /* Adjust height */
+            height: calc(100vh - 60px);
             position: fixed;
-            top:60px;  /*6Push below header */
+            top: 60px;
             left: 0;
             width: 220px;
             background-color: #090c11;
             color: white;
-            padding-top: 60px;
+            padding-top: 20px;
             transition: all 0.3s;
             z-index: 1020;
         }
@@ -85,10 +85,21 @@
                 👋 Welcome, {{ user.get_full_name|default:user.username }}
             {% endif %}
         </div>
+    
+        <div class="dropdown me-3">
+            <button class="btn btn-outline-secondary btn-sm dropdown-toggle" type="button" id="onlineUsersToggle" data-bs-toggle="dropdown" aria-expanded="false">
+                👥 Users
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end" id="onlineUsersList" aria-labelledby="onlineUsersToggle" style="max-height: 300px; overflow-y: auto;">
+                <li class="dropdown-item text-muted">Loading...</li>
+            </ul>
+        </div>
+    
         <div class="notification me-3">
             <i class="fas fa-bell fa-lg"></i>
             <span class="badge">3</span>
         </div>
+    
         <button id="toggleDarkMode" class="btn btn-sm btn-outline-secondary">🌙</button>
     </div>
     
@@ -96,10 +107,24 @@
 
 <div class="sidebar" id="sidebar">
     <a href="{% url 'transfers:main_dashboard' %}"><i class="fas fa-home"></i> <span>Dashboard</span></a>
-    <a href="{% url 'transfers:all_requests' %}"><i class="fas fa-file-alt"></i> <span>Transfer Requests</span></a>
-    <a href="{% url 'transfers:exchange_matches' %}"><i class="fas fa-random"></i> <span>Exchange Match</span></a>
-    <a href="{% url 'transfers:transfer_map' %}"><i class="fas fa-map-marked-alt"></i> <span>Transfer Map</span></a>
-    <a href="{% url 'transfers:transfer_summary' %}"><i class="fas fa-list"></i> <span>Summary</span></a>
+
+    {% for group in user.groups.all %}
+        {% if group.name == "teacher" %}
+            <a href="{% url 'transfers:submit_transfer' %}"><i class="fas fa-upload"></i> <span>Submit Transfer</span></a>
+            <a href="{% url 'transfers:transfer_summary' %}"><i class="fas fa-list"></i> <span>Transfer History</span></a>
+        {% endif %}
+        {% if group.name == "school_officer" %}
+            <a href="{% url 'transfers:incoming_transfers' %}"><i class="fas fa-arrow-down"></i> <span>Incoming Transfers</span></a>
+            <a href="{% url 'transfers:outgoing_transfers' %}"><i class="fas fa-arrow-up"></i> <span>Outgoing Transfers</span></a>
+        {% endif %}
+        {% if group.name == "district_officer" %}
+            <a href="{% url 'transfers:district_transfers' %}"><i class="fas fa-route"></i> <span>District Transfers</span></a>
+        {% endif %}
+        {% if group.name == "tamisemi_officer" %}
+            <a href="{% url 'transfers:inter_region_transfers' %}"><i class="fas fa-globe-africa"></i> <span>Inter-Region Transfers</span></a>
+        {% endif %}
+    {% endfor %}
+
     <button class="btn text-start w-100 text-white" data-bs-toggle="collapse" data-bs-target="#aboutCollapse">
         <i class="fas fa-info-circle"></i> <span>About</span>
     </button>
@@ -108,6 +133,7 @@
             This system helps manage teacher transfers.
         </div>
     </div>
+
     <button class="btn text-start w-100 text-white" data-bs-toggle="collapse" data-bs-target="#contactCollapse">
         <i class="fas fa-envelope"></i> <span>Contact</span>
     </button>
@@ -116,10 +142,13 @@
             Email: support@transfer.tz
         </div>
     </div>
+
     {% if user.is_authenticated %}
     <form method="post" action="{% url 'logout' %}" class="px-3 mt-3">
         {% csrf_token %}
-        <button class="btn btn-outline-light btn-sm w-100" type="submit"><i class="fas fa-sign-out-alt"></i> <span>Logout</span></button>
+        <button class="btn btn-outline-light btn-sm w-100" type="submit">
+            <i class="fas fa-sign-out-alt"></i> <span>Logout</span>
+        </button>
     </form>
     {% endif %}
 </div>
@@ -127,30 +156,105 @@
 <div class="main-content" id="mainContent">
     <main class="container py-4">
         {% if messages %}
-          <div class="mb-3">
-            {% for message in messages %}
-              <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
-                {{ message }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-              </div>
-            {% endfor %}
-          </div>
+            <div class="mb-3">
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endfor %}
+            </div>
         {% endif %}
-
         {% block content %}{% endblock %}
     </main>
 </div>
-
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="{% static 'js/script.js' %}"></script>
+
 <script>
+    // Sidebar toggle
     document.getElementById('toggleSidebar').addEventListener('click', function () {
         document.getElementById('sidebar').classList.toggle('collapsed');
         document.getElementById('mainContent').classList.toggle('collapsed');
     });
+
+    // Dark mode toggle
     document.getElementById('toggleDarkMode').addEventListener('click', function () {
         document.body.classList.toggle('dark-mode');
     });
+
+    // WebSocket for online status
+    const socket = new WebSocket(
+        'ws://' + window.location.host + '/ws/online-status/'
+    );
+
+    let allUsers = [];
+    let onlineUserIDs = [];
+
+    const listContainer = document.getElementById('onlineUsersList');
+
+    function updateUserList(onlineIDs) {
+        listContainer.innerHTML = '';
+
+        allUsers.forEach(user => {
+            const isOnline = onlineIDs.includes(user.id);
+            const li = document.createElement('li');
+            li.className = 'dropdown-item d-flex justify-content-between align-items-center';
+            li.innerHTML = `
+                <span>${user.full_name}</span>
+                <span class="badge ${isOnline ? 'bg-success' : 'bg-secondary'}">
+                    ${isOnline ? 'Online' : 'Offline'}
+                </span>
+            `;
+            listContainer.appendChild(li);
+        });
+
+        // If no users at all (empty), show message
+        if (allUsers.length === 0) {
+            const li = document.createElement('li');
+            li.className = 'dropdown-item text-muted';
+            li.textContent = 'No users found.';
+            listContainer.appendChild(li);
+        }
+    }
+
+    // Fetch all users and initially update the list (all offline by default)
+    fetch('/api/all-users/')
+        .then(response => response.json())
+        .then(data => {
+            // Remove duplicate users by ID
+// Remove duplicate users by full_name
+const seenNames = new Set();
+allUsers = data.filter(user => {
+    if (seenNames.has(user.full_name)) return false;
+    seenNames.add(user.full_name);
+    return true;
+});
+
+updateUserList(onlineUserIDs);
+ // onlineUserIDs is empty at first => all offline
+        })
+        .catch(err => {
+            listContainer.innerHTML = '<li class="dropdown-item text-danger">Failed to load users.</li>';
+            console.error('Failed to fetch users:', err);
+        });
+
+    // WebSocket message handler to update online users
+    socket.onmessage = function (e) {
+        const data = JSON.parse(e.data);
+        onlineUserIDs = data.online_users;
+        updateUserList(onlineUserIDs);
+    };
+
+    socket.onerror = function (e) {
+        console.error('WebSocket error:', e);
+    };
+
+    socket.onclose = function () {
+        console.warn('WebSocket connection closed');
+    };
 </script>
-<script src="{% static 'js/script.js' %}"></script>
+
+
 </body>
 </html>
