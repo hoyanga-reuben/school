@@ -20,6 +20,9 @@ from django.urls import reverse
 from django.http import HttpResponse
 from django.utils.safestring import mark_safe
 from django.contrib.auth.models import User
+from .models import Message
+from django.db import models
+
 
 def custom_login(request):
     if request.method == 'POST':
@@ -207,6 +210,8 @@ def role_redirect(request):
         return redirect('transfers:main_dashboard')
     return redirect('transfers:home')
 
+from django.db.models import Q
+
 @login_required
 def main_dashboard(request):
     user = request.user
@@ -236,7 +241,10 @@ def main_dashboard(request):
         context['view'] = 'tamisemi_officer'
         try:
             officer = TamisemiOfficerProfile.objects.get(user=user)
-            context['transfer_requests'] = TransferRequest.objects.filter(current_region=officer.region)
+            context['transfer_requests'] = TransferRequest.objects.filter(
+                current_region=officer.region,
+                status='Approved by District'
+            )
         except TamisemiOfficerProfile.DoesNotExist:
             messages.error(request, "TAMISEMI Officer profile not found. Please contact admin.")
 
@@ -349,9 +357,11 @@ def transfer_map(request):
 
 @login_required
 def received_exchange_requests(request):
-    requests = request.user.received_requests.all()
+    requests = ExchangeRequest.objects.filter(teacher_2=request.user).order_by('-created_at')
     return render(request, 'received_exchange_requests.html', {'requests': requests})
 
+
+from .models import ExchangeRequest, Message  # Adjust paths as needed
 
 @login_required
 def send_exchange_request(request, receiver_id):
@@ -362,16 +372,28 @@ def send_exchange_request(request, receiver_id):
         form = ExchangeRequestForm(request.POST)
         if form.is_valid():
             exchange_request = form.save(commit=False)
-            exchange_request.sender = request.user
-            exchange_request.receiver = receiver
+            exchange_request.teacher_1 = request.user
+            exchange_request.teacher_2 = receiver
+            exchange_request.school_1 = TransferRequest.objects.filter(teacher=request.user).latest('id').current_school
+            exchange_request.school_2 = TransferRequest.objects.filter(teacher=receiver).latest('id').current_school
             exchange_request.save()
-            messages.success(request, 'Exchange request sent!')
+
+            # Create a message alert for the receiver (optional but useful)
+            Message.objects.create(
+                sender=request.user,
+                receiver=receiver,
+                content=f"You have received an exchange request from {request.user.get_full_name()}."
+            )
+
+            messages.success(request, 'Exchange request sent successfully!')
             return redirect('transfers:exchange_matches')
     else:
         form = ExchangeRequestForm()
 
-    return render(request, 'send_exchange_request.html', {'form': form, 'receiver': receiver})
-
+    return render(request, 'send_exchange_request.html', {
+        'form': form,
+        'receiver': receiver
+    })
 
 @login_required
 def exchange_matches(request):
@@ -389,6 +411,28 @@ def exchange_matches(request):
     ).exclude(teacher=user)
 
     return render(request, 'exchange_matches.html', {'matches': matches})
+@login_required
+def unread_exchange_count(request):
+    count = ExchangeRequest.objects.filter(teacher_2=request.user, status='Pending').count()
+    return JsonResponse({'count': count})
+
+@login_required
+def approve_exchange(request, request_id):
+    exchange = get_object_or_404(ExchangeRequest, id=request_id, receiver=request.user)
+    exchange.status = 'Accepted'
+    exchange.save()
+    messages.success(request, "Exchange request approved.")
+    return redirect('transfers:received_exchange_requests')
+
+@login_required
+def reject_exchange(request, request_id):
+    exchange = get_object_or_404(ExchangeRequest, id=request_id, receiver=request.user)
+    exchange.status = 'Rejected'
+    exchange.save()
+    messages.warning(request, "Exchange request rejected.")
+    return redirect('transfers:received_exchange_requests')
+
+
 
 
 @login_required
@@ -654,21 +698,36 @@ def district_transfers(request):
     return render(request, 'transfers/district_transfers.html', {'incoming': incoming, 'outgoing': outgoing})
 
 
+from django.db.models import Q, F
+
 @login_required
 @user_passes_test(is_tamisemi_officer)
 def inter_region_transfers(request):
     try:
         officer_profile = TamisemiOfficerProfile.objects.get(user=request.user)
         region = officer_profile.region
-        incoming = TransferRequest.objects.filter(desired_region=region)
-        outgoing = TransferRequest.objects.filter(current_region=region)
+
+        # Incoming: teacher wants to come into this region
+        incoming = TransferRequest.objects.filter(
+            ~Q(current_region=F('desired_region')),  # inter-region
+            desired_region=region
+        )
+
+        # Outgoing: teacher wants to leave this region
+        outgoing = TransferRequest.objects.filter(
+            ~Q(current_region=F('desired_region')),  # inter-region
+            current_region=region
+        )
+
     except TamisemiOfficerProfile.DoesNotExist:
         messages.warning(request, "You are not assigned to any region.")
         incoming = []
         outgoing = []
 
-    return render(request, 'transfers/inter_region_transfers.html', {'incoming': incoming, 'outgoing': outgoing})
-
+    return render(request, 'transfers/inter_region_transfers.html', {
+        'incoming': incoming,
+        'outgoing': outgoing
+    })
 
 def all_users_api(request):
     users = User.objects.all().values('id', 'username', 'first_name', 'last_name')
@@ -680,3 +739,162 @@ def all_users_api(request):
         for u in users
     ]
     return JsonResponse(data, safe=False)
+
+from .models import MessageThread, Message, ExchangeRequest
+
+@login_required
+def inbox(request):
+    # Inbox threads
+    inbox_threads = MessageThread.objects.filter(participants=request.user).order_by('-created_at')
+
+    # Messages
+    sent_messages = Message.objects.filter(sender=request.user, is_draft=False, is_spam=False).order_by('-sent_at')
+    draft_messages = Message.objects.filter(sender=request.user, is_draft=True).order_by('-sent_at')
+    spam_messages = Message.objects.filter(receiver=request.user, is_spam=True).order_by('-sent_at')
+
+    return render(request, 'messaging/inbox.html', {
+        'inbox_threads': inbox_threads,
+        'sent_messages': sent_messages,
+        'draft_messages': draft_messages,
+        'spam_messages': spam_messages,
+    })
+
+
+@login_required
+def send_message(request):
+    if request.method == 'POST':
+        receiver_id = request.POST.get('receiver_id')
+        subject = request.POST.get('subject')
+        content = request.POST.get('content')
+
+        receiver = User.objects.get(id=receiver_id)
+        
+        # Create or reuse thread
+        thread = MessageThread.objects.create(subject=subject)
+        thread.participants.add(request.user, receiver)
+
+        # Create the message
+        Message.objects.create(
+            thread=thread,
+            sender=request.user,
+            receiver=receiver,
+            content=content
+        )
+
+        return redirect('view_thread', thread_id=thread.id)
+    
+from django.shortcuts import get_object_or_404, redirect, render
+from .models import MessageThread, Message
+from .forms import MessageForm
+from django.contrib.auth.decorators import login_required
+
+@login_required
+def view_thread(request, thread_id):
+    thread = get_object_or_404(MessageThread, id=thread_id, participants=request.user)
+    messages = thread.messages.order_by('sent_at')
+
+    # Mark all received messages in the thread as read
+    messages.filter(receiver=request.user, is_read=False).update(is_read=True)
+
+    if request.method == 'POST':
+        form = MessageForm(request.POST)
+        if form.is_valid():
+            msg = form.save(commit=False)
+            msg.thread = thread
+            msg.sender = request.user
+            # Receiver: pick the other participant
+            other_participants = thread.participants.exclude(id=request.user.id)
+            msg.receiver = other_participants.first() if other_participants.exists() else request.user
+            msg.save()
+            return redirect('view_thread', thread_id=thread.id)
+    else:
+        form = MessageForm()
+
+    return render(request, 'messaging/view_thread.html', {
+        'thread': thread,
+        'messages': messages,
+        'form': form,
+    })
+
+
+@login_required
+def unread_count(request):
+    user = request.user
+    unread_messages = Message.objects.filter(receiver=user, is_read=False).order_by('-sent_at')[:5]
+
+    messages_data = [
+        {
+            "sender_name": msg.sender.get_full_name() or msg.sender.username,
+            "preview": msg.content[:50],
+            "timestamp": msg.sent_at.strftime('%Y-%m-%d %H:%M'),
+            "thread_id": msg.thread.id,
+        }
+        for msg in unread_messages
+    ]
+
+    return JsonResponse({
+        "unread_count": unread_messages.count(),
+        "messages": messages_data
+    })
+
+from .forms import MessageThreadForm, MessageForm  # 👈 your form classes
+from .models import MessageThread, Message    
+
+@login_required
+def start_thread(request):
+    if request.method == 'POST':
+        form = MessageThreadForm(request.POST)
+        message_form = MessageForm(request.POST)
+        if form.is_valid() and message_form.is_valid():
+            thread = form.save()
+            for user in form.cleaned_data['participants']:
+                thread.participants.add(user)
+
+            # Save the first message
+            msg = message_form.save(commit=False)
+            msg.thread = thread
+            msg.sender = request.user
+
+            # Receiver is the first participant who is not the sender
+            others = thread.participants.exclude(id=request.user.id)
+            msg.receiver = others.first() if others.exists() else request.user
+            msg.save()
+            return redirect('view_thread', thread_id=thread.id)
+    else:
+        form = MessageThreadForm()
+        message_form = MessageForm()
+
+    return render(request, 'messaging/start_thread.html', {
+        'form': form,
+        'message_form': message_form
+    })
+
+@login_required
+def sent_messages(request):
+    messages = Message.objects.filter(sender=request.user, is_draft=False, is_deleted_by_sender=False).order_by('-sent_at')
+    return render(request, 'messaging/sent.html', {'messages': messages})
+
+@login_required
+def drafts(request):
+    drafts = Message.objects.filter(sender=request.user, is_draft=True, is_deleted_by_sender=False).order_by('-sent_at')
+    return render(request, 'messaging/drafts.html', {'messages': drafts})
+
+@login_required
+def spam_messages(request):
+    spam = Message.objects.filter(receiver=request.user, is_spam=True, is_deleted_by_receiver=False).order_by('-sent_at')
+    return render(request, 'messaging/spam.html', {'messages': spam})
+
+@login_required
+def trash(request):
+    trashed = Message.objects.filter(
+        (models.Q(sender=request.user) & models.Q(is_deleted_by_sender=True)) |
+        (models.Q(receiver=request.user) & models.Q(is_deleted_by_receiver=True))
+    ).order_by('-sent_at')
+    return render(request, 'messaging/trash.html', {'messages': trashed})
+
+@login_required
+def thread_list(request):
+    threads = MessageThread.objects.filter(participants=request.user).order_by('-created_at')
+    return render(request, 'messaging/thread_list.html', {'threads': threads})
+
+

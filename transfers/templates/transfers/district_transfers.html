@@ -2,55 +2,139 @@
 {% load static %}
 
 {% block content %}
-<div class="container mt-5">
-  <h2 class="mb-4 text-info">Transfers Within My District</h2>
+<div class="container mt-4">
+  <h2 class="mb-4 text-info">Transfers Within and Across My District</h2>
 
-  <div class="table-responsive">
-    <table id="districtTable" class="table table-hover table-bordered">
-      <thead class="table-info">
-        <tr>
-          <th>Teacher</th>
-          <th>Subject</th>
-          <th>From School</th>
-          <th>To School</th>
-          <th>Status</th>
-          <th>Reason</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for transfer in transfers %}
-        <tr>
-          <td>{{ transfer.teacher.get_full_name }}</td>
-          <td>{{ transfer.subject_taught }}</td>
-          <td>{{ transfer.current_school.name }}</td>
-          <td>{{ transfer.desired_school.name }}</td>
-          <td>
-            <span class="badge 
-              {% if transfer.status == 'Pending' %}bg-warning
-              {% elif transfer.status == 'Approved' %}bg-success
-              {% elif transfer.status == 'Rejected' %}bg-danger
-              {% else %}bg-secondary{% endif %}">
-              {{ transfer.status }}
-            </span>
-          </td>
-          <td>{{ transfer.reason }}</td>
-        </tr>
-        {% empty %}
-        <tr>
-          <td colspan="6" class="text-center text-muted">No district-level transfer requests.</td>
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table>
+  <!-- Summary Overview -->
+  <div class="row mb-4">
+    <div class="col-md-6">
+      <div class="alert alert-primary shadow-sm">
+        <strong>Incoming:</strong> {{ incoming|length }} requests to join this district
+      </div>
+    </div>
+    <div class="col-md-6">
+      <div class="alert alert-secondary shadow-sm">
+        <strong>Outgoing:</strong> {{ outgoing|length }} requests to leave this district
+      </div>
+    </div>
+  </div>
+
+  <!-- Incoming Transfers -->
+  <div class="card mb-5 shadow-sm">
+    <div class="card-header bg-primary text-white">
+      <h5 class="mb-0">Incoming Transfers</h5>
+    </div>
+    <div class="card-body table-responsive">
+      <table id="incomingTable" class="table table-bordered table-striped table-hover">
+        <thead class="table-info">
+          <tr>
+            <th>Teacher</th>
+            <th>Subject</th>
+            <th>From District</th>
+            <th>From Region</th>
+            <th>To School</th>
+            <th>Status</th>
+            <th>Reason</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for transfer in incoming %}
+          <tr>
+            <td>{{ transfer.teacher.get_full_name }}</td>
+            <td>{{ transfer.subject_taught }}</td>
+            <td>{{ transfer.current_school.ward.district.name }}</td>
+            <td>{{ transfer.current_school.ward.district.region.name }}</td>
+            <td>{{ transfer.desired_school.name }}</td>
+            <td>
+              <span class="badge 
+                {% if transfer.status == 'Pending' %}bg-warning
+                {% elif transfer.status == 'Approved' %}bg-success
+                {% elif transfer.status == 'Rejected' %}bg-danger
+                {% else %}bg-secondary{% endif %}">
+                {{ transfer.status }}
+              </span>
+            </td>
+            <td>{{ transfer.reason }}</td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="7" class="text-center text-muted">No incoming transfers found.</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Outgoing Transfers -->
+  <div class="card shadow-sm">
+    <div class="card-header bg-secondary text-white">
+      <h5 class="mb-0">Outgoing Transfers</h5>
+    </div>
+    <div class="card-body table-responsive">
+      <table id="outgoingTable" class="table table-bordered table-striped table-hover">
+        <thead class="table-info">
+          <tr>
+            <th>Teacher</th>
+            <th>Subject</th>
+            <th>From School</th>
+            <th>To District</th>
+            <th>To Region</th>
+            <th>Status</th>
+            <th>Reason</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for transfer in outgoing %}
+          <tr>
+            <td>{{ transfer.teacher.get_full_name }}</td>
+            <td>{{ transfer.subject_taught }}</td>
+            <td>{{ transfer.current_school.name }}</td>
+            <td>{{ transfer.desired_school.ward.district.name }}</td>
+            <td>{{ transfer.desired_school.ward.district.region.name }}</td>
+            <td>
+              <span class="badge 
+                {% if transfer.status == 'Pending' %}bg-warning
+                {% elif transfer.status == 'Approved' %}bg-success
+                {% elif transfer.status == 'Rejected' %}bg-danger
+                {% else %}bg-secondary{% endif %}">
+                {{ transfer.status }}
+              </span>
+            </td>
+            <td>{{ transfer.reason }}</td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="7" class="text-center text-muted">No outgoing transfers found.</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
   </div>
 </div>
 
+<!-- DataTables Scripts -->
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
+<link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.4.1/css/buttons.bootstrap5.min.css">
+
+<script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.4.1/js/dataTables.buttons.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.bootstrap5.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.html5.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.print.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
+
 <script>
   $(document).ready(function () {
-    $('#districtTable').DataTable({
-      "pageLength": 10,
-      "order": [[0, "asc"]],
-      "responsive": true
+    $('#incomingTable, #outgoingTable').DataTable({
+      responsive: true,
+      pageLength: 10,
+      dom: 'Bfrtip',
+      buttons: ['copy', 'excel', 'pdf', 'print']
     });
   });
 </script>

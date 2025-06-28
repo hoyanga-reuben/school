@@ -1,9 +1,7 @@
-<!-- templates/registration/teacher_register.html -->
 {% extends 'base_registration.html' %}
 
 {% block content %}
 <div class="registration-wrapper">
-    <!-- Instructional Sidebar -->
     <div class="info-sidebar">
         <h3>Registration Guidance</h3>
         <ul>
@@ -32,13 +30,37 @@
         </ul>
     </div>
 
-    <!-- Registration Form -->
     <div class="form-container">
-        <h2><i class="fas fa-user-plus"></i> Registration Form</h2>
+        <h2><i class="fas fa-user-plus"></i> Register for Transfer</h2>
         <form method="post" enctype="multipart/form-data">
             {% csrf_token %}
-            {{ form.as_p }}
-            <button type="submit"><i class="fas fa-paper-plane"></i> Register</button>
+
+            {% for field in form %}
+                <div class="form-field {% if field.name == 'address' or field.name == 'bio' %}full-width{% endif %}">
+                    {{ field.label_tag }}
+                    {{ field }}
+                    {% if field.help_text %}
+                        <p class="help-text">{{ field.help_text }}</p>
+                    {% endif %}
+                    {% if field.errors %}
+                        <ul class="errorlist">
+                            {% for error in field.errors %}
+                                <li>{{ error }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                </div>
+            {% endfor %}
+
+            {% if form.non_field_errors %}
+                <ul class="errorlist full-width"> {# Apply full-width to non-field errors as well #}
+                    {% for error in form.non_field_errors %}
+                        <li>{{ error }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+
+            <button type="submit"><i class="fas fa-paper-plane"></i> Register Account</button>
         </form>
     </div>
 </div>

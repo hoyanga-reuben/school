@@ -1,135 +1,299 @@
 /* General Layout */
+:root {
+  /* Set a precise header height. You might need to fine-tune this value after testing.
+     Approximate height: (60px logo height) + (p-3 padding, about 1rem*2 = 32px)
+     Let's go with 90px to be safe. */
+  --header-height: 90px;
+}
+
+body {
+  padding-top: var(--header-height); /* Create space for the fixed header */
+  margin: 0; /* Ensure no default body margin */
+  /* Removed display:flex and flex-direction from body to avoid interference with Bootstrap's .container-fluid */
+  min-height: 100vh; /* Ensure body takes full viewport height */
+}
+
+/* Header - This is the main application header */
+#mainHeader {
+  width: 100%; /* Ensure header spans full width */
+  position: fixed; /* Keeps header in place */
+  top: 0;
+  left: 0;
+  z-index: 1030; /* Higher z-index to be on top of everything */
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1); /* Optional: add shadow for visual separation */
+}
+
+/* The main container for the dashboard content (sidebar + main-content) */
 .dashboard-container {
-    display: flex;
-    min-height: 100vh;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  display: flex; /* Essential for aligning sidebar and main-content side-by-side */
+  min-height: calc(100vh - var(--header-height)); /* Ensure it fills remaining viewport height below header */
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  position: relative; /* Context for z-index, if needed for children */
 }
 
 /* Sidebar */
 .sidebar {
-    width: 100px; /* Reduced width */
-    background: #1d2a38;
-    color: #fff;
-    display: flex;
-    flex-direction: column;
-    padding: 20px 10px; /* Adjusted padding */
-    box-shadow: 2px 0 6px rgba(0,0,0,0.1);
+  width: 250px; /* Fixed width for the sidebar */
+  background: #192839;
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  padding: 20px 15px;
+  box-shadow: 2px 0 6px rgba(21, 13, 13, 0.1);
+  position: fixed; /* Keeps sidebar in place */
+  top: var(--header-height); /* Sidebar starts exactly below the main header */
+  left: 0;
+  bottom: 0; /* Extends to the bottom of the viewport */
+  overflow-y: auto; /* Allows scrolling if sidebar content is long */
+  z-index: 1020; /* Lower than header, higher than main content */
 }
 
 .sidebar-header h2 {
-    text-align: center;
-    font-size: 22px;
-    color: #f4f4f4;
-    margin-bottom: 25px;
+  text-align: center;
+  font-size: 22px;
+  color: #f4f4f4;
+  margin-bottom: 25px;
 }
 
 .sidebar-links {
-    list-style: none;
-    padding: 0;
-    margin: 0;
+  list-style: none;
+  padding: 0;
+  margin: 0;
 }
 
 .sidebar-links li {
-    margin: 12px 0;
+  margin: 12px 0;
 }
 
 .sidebar-links a {
-    color: #d1d1d1;
-    text-decoration: none;
-    font-size: 16px;
-    padding: 10px 12px;
-    border-radius: 8px;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    transition: 0.3s ease;
+  color: #d1d1d1;
+  text-decoration: none;
+  font-size: 16px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  transition: 0.3s ease;
 }
 
 .sidebar-links a:hover {
-    background: #34495e;
-    color: #fff;
+  background: #34495e;
+  color: #fff;
 }
 
 .sidebar-links a.active {
-    background: #2980b9;
-    color: #fff;
+  background: #2980b9;
+  color: #fff;
 }
 
-/* Main Content */
+/* Main Content Area beside the sidebar */
 .main-content {
-    flex-grow: 1;
-    padding: 30px;
-    background: #f4f6f8;
-    overflow-x: hidden;
-    margin-left: 180px; /* Adjusted to the sidebar width */
+  margin-left: 250px; /* Pushes content away from the fixed sidebar */
+  padding: 30px; /* Internal padding for content */
+  flex: 1; /* Allows main content to grow and take remaining horizontal space */
+  background: #f4f6f8;
+  overflow-x: hidden; /* Prevent horizontal scroll for main content */
 }
 
-/* Responsive Adjustments for Mobile */
+/* Toolbar specific styling (within main-content) */
+.toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px; /* Space below the toolbar */
+  padding: 15px;
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.search-bar {
+  padding: 8px 12px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  flex-grow: 1; /* Allow search bar to take available space */
+  margin-right: 10px;
+}
+
+.dark-mode-btn {
+  padding: 8px 15px;
+  background-color: #34495e;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.dark-mode-btn:hover {
+  background-color: #2c3e50;
+}
+
+
+/* Responsive Adjustments */
 @media screen and (max-width: 768px) {
-    .sidebar {
-        width: 120px; /* Smaller sidebar for mobile */
-    }
+  /* On smaller screens, allow main content to take full width by default */
+  .main-content {
+      margin-left: 0;
+  }
 
-    .main-content {
-        margin-left: 120px; /* Adjusted for mobile */
-    }
+  /* Hide sidebar by default on smaller screens */
+  .sidebar {
+      width: 0;
+      overflow-x: hidden;
+      transition: 0.3s ease; /* Smooth transition for showing/hiding */
+  }
+
+  /* When sidebar is active (e.g., toggled by a hamburger menu) */
+  .sidebar.active {
+      width: 180px; /* Or desired width when visible */
+  }
+
+  /* Adjust padding-top on body for a potentially smaller header on mobile,
+     though Bootstrap often handles this well. If your header is responsive
+     and shrinks, you might need to adjust --header-height in a media query here. */
+  /* Example:
+  :root {
+      --header-height: 60px; // Smaller header for mobile
+  }
+  */
 }
 
-/* Navbar Styles */
+/* Old Navbar Styles (now largely obsolete, but kept for context if any remaining usage) */
 .navbar {
-    background-color: #1b3a57;
-    color: white;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 12px 25px;
-    position: sticky;
-    top: 0;
-    z-index: 999;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  /* These styles might apply if you still have a .navbar class used elsewhere */
+  background-color: #1b3a57;
+  color: white;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 25px;
+  /* position: sticky; /* Consider if this class should not be fixed or sticky */
+  top: 0;
+  z-index: 999;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
 }
 
-.navbar-left {
-    display: flex;
-    align-items: center;
+/* --- Dark Mode Styles --- */
+body.dark-mode {
+  background-color: #2c2c2c; /* Darker background for the body */
+  color: #f0f0f0; /* Lighter text color */
 }
 
-.navbar-logo {
-    height: 38px;
-    margin-right: 10px;
+body.dark-mode .sidebar {
+  background-color: #1a1a1a; /* Even darker sidebar */
+  box-shadow: 2px 0 6px rgba(0,0,0,0.4);
 }
 
-.navbar-title {
-    font-size: 18px;
-    font-weight: bold;
+body.dark-mode .sidebar-links a {
+  color: #ccc;
 }
 
-.navbar-links {
-    display: flex;
-    align-items: center;
-    gap: 16px;
+body.dark-mode .sidebar-links a:hover {
+  background: #3a3a3a;
+  color: #fff;
 }
 
-.navbar-links a {
-    color: white;
-    text-decoration: none;
-    font-weight: 500;
+body.dark-mode .sidebar-links a.active {
+  background: #007bff; /* Keep a distinct highlight color */
+  color: #fff;
 }
 
-.navbar-links a:hover {
-    text-decoration: underline;
+body.dark-mode #mainHeader {
+  background-color: #1a1a1a !important; /* Darker header */
+  color: #f0f0f0 !important;
+  border-bottom-color: #444 !important;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.4);
 }
 
-.navbar-user {
-    display: flex;
-    align-items: center;
-    gap: 8px;
+body.dark-mode #mainHeader .h4 {
+  color: #f0f0f0;
 }
 
-.navbar-user-image {
-    width: 32px;
-    height: 32px;
-    border-radius: 50%;
-    object-fit: cover;
-    border: 2px solid white;
+body.dark-mode .main-content {
+  background-color: #333; /* Darker main content area */
 }
+
+body.dark-mode .welcome-message h2 {
+  color: #f0f0f0;
+}
+
+body.dark-mode .toolbar {
+  background-color: #3a3a3a; /* Darker toolbar */
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+body.dark-mode .search-bar {
+  background-color: #444;
+  color: #f0f0f0;
+  border-color: #555;
+}
+
+body.dark-mode .search-bar::placeholder {
+  color: #bbb;
+}
+
+body.dark-mode .dark-mode-btn {
+  background-color: #555;
+  color: #f0f0f0;
+}
+
+body.dark-mode .dark-mode-btn:hover {
+  background-color: #666;
+}
+
+/* For tables */
+body.dark-mode table.dataTable thead th,
+body.dark-mode table.dataTable tbody td {
+  color: #f0f0f0;
+}
+
+body.dark-mode table.dataTable tbody tr {
+  background-color: #3a3a3a;
+}
+
+body.dark-mode table.dataTable tbody tr:nth-child(even) {
+  background-color: #333; /* Slightly different shade for even rows */
+}
+
+body.dark-mode table.dataTable tbody tr:hover {
+  background-color: #444; /* Hover effect */
+}
+
+body.dark-mode .dataTables_wrapper .dataTables_paginate .paginate_button {
+  color: #f0f0f0 !important;
+  background-color: #444 !important;
+}
+
+body.dark-mode .dataTables_wrapper .dataTables_paginate .paginate_button.current,
+body.dark-mode .dataTables_wrapper .dataTables_paginate .paginate_button.current:hover {
+  background-color: #007bff !important;
+  color: #fff !important;
+}
+
+body.dark-mode .dataTables_wrapper .dataTables_length,
+body.dark-mode .dataTables_wrapper .dataTables_filter,
+body.dark-mode .dataTables_wrapper .dataTables_info,
+body.dark-mode .dataTables_wrapper .dataTables_processing,
+body.dark-mode .dataTables_wrapper .dataTables_length select,
+body.dark-mode .dataTables_wrapper .dataTables_filter input {
+  color: #f0f0f0 !important;
+}
+body.dark-mode .dataTables_wrapper .dataTables_length select {
+  background-color: #444 !important;
+  border-color: #555 !important;
+}
+body.dark-mode .dataTables_wrapper .dataTables_filter input {
+  background-color: #444 !important;
+  border-color: #555 !important;
+}
+
+/* Bootstrap alerts */
+body.dark-mode .alert {
+  color: #f0f0f0;
+}
+body.dark-mode .alert-success { background-color: #28a745; border-color: #28a745; }
+body.dark-mode .alert-info { background-color: #17a2b8; border-color: #17a2b8; }
+body.dark-mode .alert-warning { background-color: #ffc107; border-color: #ffc107; color: #333; } /* Warning usually needs dark text */
+body.dark-mode .alert-danger { background-color: #dc3545; border-color: #dc3545; }

@@ -1,0 +1,16 @@
+{% extends "base_generic.html" %}
+{% block content %}
+<div class="container mt-4">
+  <h3>My Conversations</h3>
+  <ul class="list-group">
+    {% for thread in threads %}
+      <li class="list-group-item">
+        <a href="{% url 'view_thread' thread.id %}">{{ thread.subject }}</a>
+        <small class="text-muted">Started on {{ thread.created_at|date:"Y-m-d H:i" }}</small>
+      </li>
+    {% empty %}
+      <li class="list-group-item text-muted">No threads found.</li>
+    {% endfor %}
+  </ul>
+</div>
+{% endblock %}

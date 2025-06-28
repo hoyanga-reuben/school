@@ -57,6 +57,12 @@ class TransferRequest(models.Model):
     district_approval = models.CharField(max_length=20, choices=APPROVAL_CHOICES, default='Pending')
     tamisemi_approval = models.CharField(max_length=20, choices=APPROVAL_CHOICES, default='Pending')
 
+    # New approval date fields (optional, null/blank because approval may not happen yet)
+    school_approval_date = models.DateTimeField(null=True, blank=True)
+    district_approval_date = models.DateTimeField(null=True, blank=True)
+    tamisemi_approval_date = models.DateTimeField(null=True, blank=True)
+
+    # existing other fields...
     # Teacher information
     SEX_CHOICES = [
         ('Male', 'Male'),
@@ -110,6 +116,36 @@ class TransferRequest(models.Model):
 
     def is_inter_region(self):
         return self.current_region != self.desired_region
+    
+    
+    # Override save to set approval dates when approval status changes
+    def save(self, *args, **kwargs):
+        # Set approval dates only when status changes from 'Pending' to Approved or Rejected
+        if self.pk:  # existing object
+            orig = TransferRequest.objects.get(pk=self.pk)
+
+            if orig.school_approval == 'Pending' and self.school_approval != 'Pending':
+                self.school_approval_date = timezone.now()
+            if orig.district_approval == 'Pending' and self.district_approval != 'Pending':
+                self.district_approval_date = timezone.now()
+            if orig.tamisemi_approval == 'Pending' and self.tamisemi_approval != 'Pending':
+                self.tamisemi_approval_date = timezone.now()
+
+        super().save(*args, **kwargs)
+
+    @property
+    def current_approval_stage(self):
+        if self.school_approval == 'Pending':
+            return 'School Approval Pending'
+        elif self.district_approval == 'Pending':
+            return 'District Approval Pending'
+        elif self.tamisemi_approval == 'Pending':
+            return 'TAMISEMI Approval Pending'
+        elif self.status == 'Approved':
+            return 'Approved'
+        elif self.status == 'Rejected':
+            return 'Rejected'
+        return 'Unknown'
 
     @property
     def can_cancel(self):
@@ -206,8 +242,7 @@ class DistrictOfficer(models.Model):
     district = models.ForeignKey(District, on_delete=models.CASCADE)
 
     def __str__(self):
-        return f"{self.user.get_full_name} - {self.district.name}"
-
+        return f"{self.user.get_full_name()} - {self.district.name}"
 
 class TamisemiOfficer(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
@@ -215,3 +250,40 @@ class TamisemiOfficer(models.Model):
 
     def __str__(self):
         return f"{self.user.get_full_name()} - {self.region.name}"
+    
+
+class Notification(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='notifications')
+    message = models.TextField()
+    is_read = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"{self.user.username} - {self.message[:30]}"
+    
+class MessageThread(models.Model):
+    participants = models.ManyToManyField(User)
+    subject = models.CharField(max_length=255)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.subject
+
+
+class Message(models.Model):
+    thread = models.ForeignKey(MessageThread, related_name='messages', on_delete=models.CASCADE, null=True, blank=True)
+    sender = models.ForeignKey(User, related_name='sent_messages', on_delete=models.CASCADE)
+    receiver = models.ForeignKey(User, related_name='received_messages', on_delete=models.CASCADE)
+    content = models.TextField()
+    is_read = models.BooleanField(default=False)
+    is_draft = models.BooleanField(default=False)
+    is_spam = models.BooleanField(default=False)
+    is_deleted_by_sender = models.BooleanField(default=False)
+    is_deleted_by_receiver = models.BooleanField(default=False)
+    sent_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.sender} -> {self.receiver} | {self.thread.subject}"

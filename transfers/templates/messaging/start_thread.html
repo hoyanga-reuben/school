@@ -1,0 +1,19 @@
+{% extends "base_generic.html" %}
+
+{% block content %}
+<div class="container mt-4">
+  <h2>Send a Message</h2>
+  <form method="post">
+    {% csrf_token %}
+    <div class="mb-3">
+      <label for="receiver_id" class="form-label">To (User ID)</label>
+      <input type="number" name="receiver_id" id="receiver_id" class="form-control" required>
+    </div>
+    <div class="mb-3">
+      <label for="content" class="form-label">Message</label>
+      <textarea name="content" id="content" rows="4" class="form-control" required></textarea>
+    </div>
+    <button type="submit" class="btn btn-primary">Send</button>
+  </form>
+</div>
+{% endblock %}

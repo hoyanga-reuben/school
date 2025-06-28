@@ -1,0 +1,45 @@
+{% extends "base_generic.html" %}
+{% block content %}
+<div class="container mt-4">
+    <h3>Conversation: {{ thread.subject }}</h3>
+    <hr>
+
+    <div class="mb-4" style="max-height: 400px; overflow-y: auto;">
+        {% for msg in messages %}
+            <div class="mb-2">
+                <strong>{{ msg.sender.get_full_name }}</strong>
+                <small class="text-muted">{{ msg.sent_at|date:"Y-m-d H:i" }}</small>
+
+                <p style="background-color: yellow; padding: 5px; border-radius: 3px;">
+                    <strong>DEBUG INFO:</strong><br>
+                    msg.sender: {{ msg.sender }} (Type: {{ msg.sender.__class__.__name__ }})<br>
+                    msg.sender ID: {{ msg.sender.id }}<br>
+                    <br>
+                    Current User: {{ user }} (Type: {{ user.__class__.__name__ }})<br>
+                    Current User ID: {{ user.id }}<br>
+                    Current User Authenticated: {{ user.is_authenticated }}<br>
+                    <br>
+                    Comparison (msg.sender.id == user.id): **{% if msg.sender.id == user.id %}TRUE{% else %}FALSE{% endif %}**
+                </p>
+                {% if msg.sender == request.user %}
+  <div class="border rounded p-2 mt-1" style="background-color: #e0f7fa;">
+{% else %}
+  <div class="border rounded p-2 mt-1" style="background-color: #f8f9fa;">
+{% endif %}
+    {{ msg.content }}
+  </div>
+
+            </div>
+        {% endfor %}
+    </div>
+
+    <form method="post">
+        {% csrf_token %}
+        <div class="mb-3">
+            <textarea name="content" class="form-control" rows="3" placeholder="Write a reply..." required></textarea>
+        </div>
+        <button type="submit" class="btn btn-success">Send Reply</button>
+        <a href="{% url 'inbox' %}" class="btn btn-secondary">Back to Inbox</a>
+    </form>
+</div>
+{% endblock %}

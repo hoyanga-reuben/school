@@ -40,18 +40,47 @@
     </table>
 </div>
 
-<!-- DataTables + SweetAlert -->
-<link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.3/dist/sweetalert2.min.css">
+<!-- DataTables + Export Buttons CSS -->
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+<link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.4.1/css/buttons.dataTables.min.css">
+
+<!-- JS Dependencies -->
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-<script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.4.1/js/dataTables.buttons.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.html5.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.print.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/pdfmake.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/vfs_fonts.js"></script>
+
+<!-- Optional: SweetAlert for future features -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.3/dist/sweetalert2.min.css">
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-<script src="{% static 'js/school_all_transfers.js' %}"></script>
+
+<!-- Notifications -->
 <script id="school-notifications-data" type="application/json">
     {{ notifications_json|safe }}
 </script>
-<script>
-    const schoolNotifications = JSON.parse(document.getElementById("school-notifications-data").textContent);
-</script>
 
+<!-- DataTable Init -->
+<script>
+  $(document).ready(function () {
+    const table = $('#transfersTable').DataTable({
+      dom: 'Bfrtip',
+      buttons: ['copy', 'excel', 'pdf', 'print'],
+      responsive: true,
+      pageLength: 10,
+      order: [[4, 'desc']],
+    });
+
+    // Live search input
+    $('#searchInput').on('keyup', function () {
+      table.search(this.value).draw();
+    });
+
+    // Load notifications (future use)
+    const schoolNotifications = JSON.parse(document.getElementById("school-notifications-data").textContent);
+  });
+</script>
 {% endblock %}

@@ -2,52 +2,104 @@
 {% load static %}
 
 {% block content %}
-<div class="container mt-5">
+<div class="container mt-4">
   <h2 class="mb-4 text-dark">Inter-Region Transfer Requests</h2>
 
-  <div class="table-responsive">
-    <table id="interRegionTable" class="table table-bordered table-striped">
-      <thead class="table-dark">
-        <tr>
-          <th>Teacher</th>
-          <th>Subject</th>
-          <th>From Region</th>
-          <th>To Region</th>
-          <th>Status</th>
-          <th>Reason</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for transfer in transfers %}
-        <tr>
-          <td>{{ transfer.teacher.get_full_name }}</td>
-          <td>{{ transfer.subject_taught }}</td>
-          <td>{{ transfer.current_school.ward.district.region.name }}</td>
-          <td>{{ transfer.desired_school.ward.district.region.name }}</td>
-          <td>
-            <span class="badge 
-              {% if transfer.status == 'Pending' %}bg-warning
-              {% elif transfer.status == 'Approved' %}bg-success
-              {% elif transfer.status == 'Rejected' %}bg-danger
-              {% else %}bg-secondary{% endif %}">
-              {{ transfer.status }}
-            </span>
-          </td>
-          <td>{{ transfer.reason }}</td>
-        </tr>
-        {% empty %}
-        <tr>
-          <td colspan="6" class="text-center text-muted">No inter-region transfer requests found.</td>
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table>
+  <!-- Incoming Transfers -->
+  <div class="card mb-5 shadow-sm">
+    <div class="card-header bg-primary text-white">
+      <h5 class="mb-0">Incoming Transfers (To Your Region)</h5>
+    </div>
+    <div class="card-body table-responsive">
+      <table id="incomingTable" class="table table-bordered table-striped">
+        <thead class="table-dark">
+          <tr>
+            <th>Teacher</th>
+            <th>Subject</th>
+            <th>From Region</th>
+            <th>Status</th>
+            <th>Reason</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for transfer in incoming %}
+          <tr>
+            <td>{{ transfer.teacher.get_full_name }}</td>
+            <td>{{ transfer.subject_taught }}</td>
+            <td>{{ transfer.current_region.name }}</td>
+            <td>
+              <span class="badge 
+                {% if transfer.status == 'Pending' %}bg-warning
+                {% elif transfer.status == 'Approved' %}bg-success
+                {% elif transfer.status == 'Rejected' %}bg-danger
+                {% else %}bg-secondary{% endif %}">
+                {{ transfer.status }}
+              </span>
+            </td>
+            <td>{{ transfer.reason }}</td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="5" class="text-center text-muted">No incoming inter-region transfer requests.</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Outgoing Transfers -->
+  <div class="card shadow-sm">
+    <div class="card-header bg-secondary text-white">
+      <h5 class="mb-0">Outgoing Transfers (From Your Region)</h5>
+    </div>
+    <div class="card-body table-responsive">
+      <table id="outgoingTable" class="table table-bordered table-striped">
+        <thead class="table-dark">
+          <tr>
+            <th>Teacher</th>
+            <th>Subject</th>
+            <th>To Region</th>
+            <th>Status</th>
+            <th>Reason</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for transfer in outgoing %}
+          <tr>
+            <td>{{ transfer.teacher.get_full_name }}</td>
+            <td>{{ transfer.subject_taught }}</td>
+            <td>{{ transfer.desired_region.name }}</td>
+            <td>
+              <span class="badge 
+                {% if transfer.status == 'Pending' %}bg-warning
+                {% elif transfer.status == 'Approved' %}bg-success
+                {% elif transfer.status == 'Rejected' %}bg-danger
+                {% else %}bg-secondary{% endif %}">
+                {{ transfer.status }}
+              </span>
+            </td>
+            <td>{{ transfer.reason }}</td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="5" class="text-center text-muted">No outgoing inter-region transfer requests.</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
   </div>
 </div>
 
+<!-- DataTables Script -->
 <script>
   $(document).ready(function () {
-    $('#interRegionTable').DataTable({
+    $('#incomingTable').DataTable({
+      "pageLength": 10,
+      "responsive": true
+    });
+    $('#outgoingTable').DataTable({
       "pageLength": 10,
       "responsive": true
     });

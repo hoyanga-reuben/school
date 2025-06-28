@@ -122,3 +122,26 @@ class ExchangeRequestForm(forms.ModelForm):
     class Meta:
         model = ExchangeRequest
         fields = ['message']
+
+from django import forms
+from .models import Message, MessageThread
+from django.contrib.auth.models import User
+
+class MessageThreadForm(forms.ModelForm):
+    participants = forms.ModelMultipleChoiceField(
+        queryset=User.objects.all(),
+        widget=forms.SelectMultiple(attrs={'class': 'form-control'}),
+        help_text="Select all participants (including yourself)."
+    )
+
+    class Meta:
+        model = MessageThread
+        fields = ['subject', 'participants']
+
+class MessageForm(forms.ModelForm):
+    class Meta:
+        model = Message
+        fields = ['content']
+        widgets = {
+            'content': forms.Textarea(attrs={'class': 'form-control', 'rows': 4}),
+        }

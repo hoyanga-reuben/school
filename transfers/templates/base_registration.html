@@ -1,162 +1,340 @@
-<!-- templates/base_registration.html -->
 {% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Teacher Transfer Registration{% endblock %}</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}Teacher Transfer Registration{% endblock %}</title>
 
-    <link rel="stylesheet" href="{% static 'css/home.css' %}">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
-    <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f7f9fc;
-            margin: 0;
-            padding: 0;
-        }
+  <link rel="stylesheet" href="{% static 'css/home.css' %}">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f7f9fc;
+      margin: 0;
+      padding: 0;
+      overflow-y: auto; /* Allow scrolling if absolutely necessary, but aim to avoid it */
+      min-height: 100vh; /* Ensure body takes full viewport height */
+      display: flex; /* Use flexbox for overall layout */
+      flex-direction: column; /* Stack content vertically */
+    }
 
-        header {
-            background-color: #144272;
-            color: white;
-            padding: 20px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
+    header {
+      background-color: #144272;
+      color: white;
+      padding: 6px 10px; /* Micro-adjusted header padding */
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 48px; /* Slightly reduced fixed header height */
+    }
 
-        header .logo {
-            display: flex;
-            align-items: center;
-        }
+    .logo {
+      display: flex;
+      align-items: center;
+    }
 
-        header .logo img {
-            height: 50px;
-            margin-right: 15px;
-        }
+    .logo img {
+      height: 28px; /* Micro-adjusted logo size */
+      margin-right: 5px; /* Micro-adjusted margin */
+    }
 
-        header .system-name {
-            font-size: 22px;
-            font-weight: bold;
-        }
+    .system-name {
+      font-size: 15px; /* Micro-adjusted system name font */
+      font-weight: bold;
+    }
 
-        .form-container {
-            max-width: 600px;
-            margin: 60px auto;
-            padding: 40px;
-            background: white;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
-            border-radius: 12px;
-        }
+    .registration-wrapper {
+      flex-grow: 1; /* Allow content to grow and push footer down */
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      align-items: flex-start; /* Align items to the top to save vertical space */
+      margin-top: 8px; /* Micro-adjusted top margin */
+      padding: 0 6px; /* Micro-adjusted horizontal padding */
+      gap: 10px; /* Reduced gap between sidebar and form */
+    }
 
-        h2 {
-            text-align: center;
-            margin-bottom: 25px;
-            color: #144272;
-        }
+    .info-sidebar {
+      flex: 0 0 270px; /* Fixed width for sidebar for more predictability */
+      background-color: #f1f4f9;
+      padding: 10px; /* Reduced padding */
+      border-radius: 6px; /* Smaller border radius */
+      font-size: 11.5px; /* Even smaller font size */
+      color: #333;
+      box-shadow: 0 0 4px rgba(0, 0, 0, 0.04); /* Lighter, more subtle shadow */
+      line-height: 1.35; /* Even tighter line height */
+      max-height: calc(100vh - 120px); /* Constrain sidebar height to prevent overflow */
+      overflow-y: auto; /* Add scrollbar to sidebar if its content is too long */
+    }
 
-        form {
-            display: flex;
-            flex-direction: column;
-        }
+    .info-sidebar h3 {
+      font-size: 13px; /* Smaller heading */
+      margin-bottom: 5px; /* Reduced margin */
+      color: #144272;
+      padding-bottom: 3px; /* Small padding at bottom of heading */
+      border-bottom: 1px solid #ddd; /* Subtle separator */
+    }
 
-        form input, form select, form textarea {
-            margin-bottom: 15px;
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 8px;
-            font-size: 16px;
-        }
+    .info-sidebar ul {
+      list-style: disc inside;
+      padding-left: 0;
+      margin: 0;
+    }
 
-        button {
-            background-color: #144272;
-            color: white;
-            padding: 12px;
-            border: none;
-            border-radius: 8px;
-            font-size: 16px;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-        }
+    .info-sidebar ul.nested {
+      list-style: circle inside;
+      margin-left: 5px; /* Micro-adjusted margin */
+      margin-top: 1px; /* Micro-adjusted margin */
+    }
 
-        button:hover {
-            background-color: #205295;
-        }
+    .info-sidebar li {
+      margin-bottom: 1px; /* Even tighter spacing between list items */
+    }
 
-        .footer {
-            text-align: center;
-            padding: 15px 0;
-            background-color: #eaeaea;
-            position: fixed;
-            bottom: 0;
-            width: 100%;
-            font-size: 14px;
-        }
+    .form-container {
+      flex: 1; /* Allow form to take remaining width */
+      min-width: 320px; /* Ensure form doesn't shrink too much */
+      max-width: 550px; /* Adjusted max-width for form, allowing tight two columns */
+      background: white;
+      padding: 16px; /* Reduced padding */
+      border-radius: 6px;
+      box-shadow: 0 0 4px rgba(0,0,0,0.06);
+    }
 
-        .registration-wrapper {
-            display: flex;
-            gap: 40px;
-            justify-content: center;
-            align-items: flex-start;
-            margin-top: 40px;
-            padding: 0 20px;
-        }
+    h2 {
+      text-align: center;
+      color: #144272;
+      margin-bottom: 10px; /* Reduced margin */
+      font-size: 19px; /* Smaller heading */
+    }
 
-        .info-sidebar {
-            flex: 1;
-            max-width: 400px;
-            background-color: #f1f4f9;
-            padding: 25px;
-            border-radius: 10px;
-            font-size: 15px;
-            color: #333;
-            box-shadow: 0 0 8px rgba(0, 0, 0, 0.08);
-        }
+    form {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); /* Even tighter responsive columns */
+      gap: 7px 10px; /* Even smaller gap between fields */
+    }
 
-        .info-sidebar h3 {
-            color: #144272;
-            margin-bottom: 15px;
-        }
+    /* Styles for manually rendered form fields */
+    .form-field {
+      margin-bottom: 0;
+      display: flex;
+      flex-direction: column;
+    }
 
-        .info-sidebar ul {
-            list-style: disc inside;
-            padding-left: 0;
-        }
+    .form-field label {
+      display: block;
+      margin-bottom: 1px; /* Minimal space between label and input */
+      font-weight: bold;
+      color: #555;
+      font-size: 11px; /* Smallest label font size */
+    }
 
-        .info-sidebar ul.nested {
-            list-style: circle inside;
-            margin-left: 15px;
-            margin-top: 5px;
-        }
+    .form-field input,
+    .form-field select {
+      padding: 4px 6px; /* Minimal padding */
+      font-size: 11px; /* Smallest input font size */
+      border: 1px solid #ccc;
+      border-radius: 3px; /* Even smaller border radius */
+      width: 100%;
+      box-sizing: border-box;
+      height: 26px; /* Minimal fixed height for inputs/selects */
+    }
 
-        .flash-message {
-            background-color: #e0f0ff;
-            color: #144272;
-            padding: 12px;
-            margin: 20px auto;
-            max-width: 600px;
-            text-align: center;
-            border-radius: 8px;
-            box-shadow: 0 0 5px rgba(0,0,0,0.05);
-        }
-    </style>
+    .form-field textarea {
+      padding: 4px 6px; /* Minimal padding */
+      font-size: 11px; /* Smallest textarea font size */
+      border: 1px solid #ccc;
+      border-radius: 3px;
+      width: 100%;
+      box-sizing: border-box;
+      min-height: 35px; /* Further reduced min-height for textareas */
+      max-height: 45px; /* Further reduced max-height for textareas */
+      resize: vertical; /* Allow vertical resize only */
+    }
+
+    .form-field input:focus,
+    .form-field select:focus,
+    .form-field textarea:focus {
+      border-color: #144272;
+      outline: none;
+      box-shadow: 0 0 0 1px rgba(20, 66, 114, 0.08); /* Minimal focus shadow */
+    }
+
+    .form-field ul.errorlist {
+      color: #d9534f;
+      font-size: 9px; /* Smallest practical font size for error messages */
+      margin-top: 1px; /* Minimal margin */
+      padding-left: 0;
+      list-style: none;
+      line-height: 1.2; /* Tighten error line height */
+    }
+
+    /* Styles for fields that should span full width */
+    .form-field.full-width {
+      grid-column: 1 / -1; /* Span all columns */
+    }
+
+    form button {
+      grid-column: 1 / -1; /* Make button span all columns */
+      justify-self: center;
+      background-color: #144272;
+      color: white;
+      padding: 7px 15px; /* Minimal button padding */
+      font-size: 12px; /* Minimal button font size */
+      border: none;
+      border-radius: 4px; /* Smaller border radius */
+      cursor: pointer;
+      transition: background-color 0.3s ease, transform 0.2s ease;
+      width: auto;
+      min-width: 100px; /* Reduced min-width */
+      box-shadow: 0 1px 1.5px rgba(0,0,0,0.07); /* Lighter, more subtle shadow */
+      margin-top: 6px; /* Reduced margin above button */
+    }
+
+    form button:hover {
+      background-color: #205295;
+      transform: translateY(-0.25px); /* Even more subtle lift on hover */
+    }
+
+    form button:active {
+      transform: translateY(0);
+    }
+
+    .footer {
+      text-align: center;
+      padding: 8px; /* Minimal footer padding */
+      font-size: 10px; /* Smallest footer font size */
+      background-color: #eaeaea;
+      margin-top: 15px; /* Reduced top margin for footer */
+      color: #555;
+      flex-shrink: 0; /* Prevent footer from shrinking */
+    }
+
+    .flash-message {
+      background-color: #e0f0ff;
+      color: #144272;
+      padding: 7px; /* Minimal padding */
+      margin: 8px auto; /* Minimal margin */
+      max-width: 480px; /* Reduced max-width */
+      text-align: center;
+      border-radius: 3px; /* Smaller border radius */
+      border: 1px solid #cce0ff;
+      font-weight: 500;
+      font-size: 11px; /* Smaller flash message font size */
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+      .registration-wrapper {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      .info-sidebar {
+        flex: 1 1 auto; /* Allow sidebar to stretch on small screens */
+        max-width: 100%;
+        max-height: none; /* Remove height constraint for stacking */
+        overflow-y: visible; /* No scrollbar on stacked sidebar */
+      }
+      form {
+        grid-template-columns: 1fr; /* Stack columns on smaller screens */
+      }
+      form button {
+        width: 100%;
+      }
+      .form-container,
+      .info-sidebar {
+        margin: 0 4px; /* Minimal horizontal margin on smaller screens */
+      }
+    }
+
+    /* Very small screen adjustments (even more aggressive) */
+    @media (max-width: 500px) {
+      header {
+        height: 40px;
+        padding: 4px 8px;
+      }
+      .logo img {
+        height: 25px;
+      }
+      .system-name {
+        font-size: 14px;
+      }
+      .registration-wrapper {
+        margin-top: 5px;
+        padding: 0 4px;
+        gap: 8px;
+      }
+      .info-sidebar {
+        padding: 8px;
+        font-size: 10px;
+      }
+      .info-sidebar h3 {
+        font-size: 12px;
+        margin-bottom: 4px;
+        padding-bottom: 2px;
+      }
+      .form-container {
+        padding: 12px;
+      }
+      h2 {
+        font-size: 16px;
+        margin-bottom: 8px;
+      }
+      form {
+        gap: 5px 8px; /* Absolute smallest gaps */
+      }
+      .form-field label {
+        font-size: 10px; /* Smallest practical label size */
+      }
+      .form-field input,
+      .form-field select,
+      .form-field textarea {
+        font-size: 10px; /* Smallest practical input font size */
+        padding: 3px 5px; /* Smallest practical padding */
+        height: 24px; /* Absolute minimal height for inputs */
+      }
+      .form-field textarea {
+        min-height: 30px; /* Absolute minimal textarea height */
+        max-height: 40px;
+      }
+      .form-field ul.errorlist {
+        font-size: 8px; /* Absolute smallest error font size */
+      }
+      form button {
+        font-size: 11px; /* Absolute smallest practical button font size */
+        padding: 6px 10px; /* Absolute smallest practical button padding */
+        min-width: 90px;
+      }
+      .footer {
+        padding: 6px;
+        font-size: 9px;
+        margin-top: 10px;
+      }
+      .flash-message {
+        padding: 6px;
+        font-size: 10px;
+        margin: 6px auto;
+      }
+    }
+  </style>
 </head>
 <body>
-    <header>
-        <div class="logo">
-            <img src="{% static 'images/logo.png' %}" alt="Ministry Logo">
-            <span class="system-name">Teacher Transfer Management System</span>
-        </div>
-        <div class="header-icons">
-            <i class="fas fa-user-plus"></i>
-        </div>
-    </header>
-
-    {% block content %}{% endblock %}
-
-    <div class="footer">
-        &copy; 2025 Teacher Transfer System — Ministry of Education
+  <header>
+    <div class="logo">
+      <img src="{% static 'images/logo.png' %}" alt="Ministry Logo">
+      <span class="system-name">Teacher Transfer Management System</span>
     </div>
+    <div class="header-icons">
+      <i class="fas fa-user-plus"></i>
+    </div>
+  </header>
+
+  {% block content %}{% endblock %}
+
+  <div class="footer">
+    &copy; 2025 Teacher Transfer System — Ministry of Education
+  </div>
 </body>
 </html>

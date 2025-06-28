@@ -2,226 +2,248 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Submit Transfer Request</title>
-    <link rel="stylesheet" href="{% static 'css/transfer_form.css' %}">
+  <meta charset="UTF-8">
+  <title>Submit Transfer Request</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #f4f6f9;
+      margin: 0;
+      padding: 0;
+      font-size: 13px;
+    }
+
+    .header {
+      background-color: #144272;
+      color: white;
+      padding: 6px 15px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .logo-title {
+      display: flex;
+      align-items: center;
+    }
+
+    .logo-title img {
+      height: 20px;
+      margin-right: 6px;
+    }
+
+    .site-nav a {
+      color: white;
+      text-decoration: none;
+      margin-left: 10px;
+      font-size: 12px;
+    }
+
+    .container {
+      max-width: 98%;
+      margin: 10px auto;
+      padding: 8px;
+      background: #ffffff;
+      border-radius: 6px;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+    }
+
+    form {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .form-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .form-card {
+      flex: 1;
+      min-width: 280px;
+      padding: 10px;
+      border: 1px solid #d6e4f5;
+      background-color: #fbfdff;
+      border-radius: 6px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    .form-card h3 {
+      margin: 0 0 8px;
+      font-size: 14px;
+      color: #144272;
+      border-bottom: 1px solid #ccc;
+      padding-bottom: 4px;
+      text-align: center;
+    }
+
+    .grid-2, .grid-3 {
+      display: grid;
+      gap: 6px;
+    }
+
+    .grid-2 {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    .grid-3 {
+      grid-template-columns: repeat(3, 1fr);
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+    }
+
+    label {
+      font-size: 13px;
+      font-weight: 600;
+      margin-bottom: 2px;
+      color: #333;
+    }
+
+    input, select, textarea {
+      font-size: 12px;
+      padding: 2px 4px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      height: 22px;
+      background-color: #fff;
+    }
+
+    /* FINAL FIELD WIDTH ADJUSTMENT */
+input[type="text"],
+input[type="email"],
+input[type="file"],
+select,
+textarea {
+  width: 90%; /* reduced from 100% */
+  max-width: 200px; /* enforce compact size */
+  padding: 2px 4px;
+  font-size: 12px;
+}
+
+textarea {
+  max-width: 95%;
+  min-height: 35px;
+  max-height: 45px;
+}
+
+    
+
+    .submit-area {
+      text-align: center;
+      padding: 5px 0 15px 0;
+    }
+
+    button {
+      background-color: #144272;
+      color: white;
+      padding: 5px 14px;
+      border: none;
+      border-radius: 4px;
+      font-size: 13px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #205295;
+    }
+
+    @media (max-width: 900px) {
+      .form-row {
+        flex-direction: column;
+      }
+      .grid-2, .grid-3 {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
 </head>
 <body>
-  <!-- HEADER WITH LOGO AND NAVBAR -->
-<header class="site-header">
-  <div class="container">
-    <div class="logo-title">
-      <img src="{% static 'images/logo.png' %}" alt="Logo" class="logo">
-      <h1 class="title">Teacher Transfer Request System</h1>
-    </div>
-    <nav class="site-nav">
-      <ul>
-        <li><a href="{% url 'transfers:home' %}">Home</a></li>
-        <li><a href="{% url 'transfers:submit_transfer' %}">Submit Request</a></li>
-        <li><a href="{% url 'transfers:transfer_history' %}">Transfer History</a></li>
-      </ul>
-    </nav>
-  </div>
-</header>
 
-{% if messages %}
-  <ul class="messages">
-    {% for message in messages %}
-      <li class="{{ message.tags }}">{{ message }}</li>
-    {% endfor %}
-  </ul>
-{% endif %}
+<div class="header">
+  <div class="logo-title">
+    <img src="{% static 'images/logo.png' %}" alt="Logo">
+    <strong>Teacher Transfer Request</strong>
+  </div>
+  <div class="site-nav">
+    <a href="{% url 'transfers:home' %}">Home</a>
+    <a href="{% url 'transfers:submit_transfer' %}">Submit</a>
+    <a href="{% url 'transfers:transfer_history' %}">History</a>
+  </div>
+</div>
 
-<form method="post" enctype="multipart/form-data">
-  {% csrf_token %}
-  {{ form.non_field_errors }}
+<div class="container">
+  <form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
 
-  <!-- Personal Information -->
-  <h3>Personal Info</h3>
-  <div class="form-group">
-    {{ form.full_name.label_tag }} {{ form.full_name }}
-  </div>
-  <div class="form-group">
-    {{ form.email.label_tag }} {{ form.email }}
-  </div>
-  <div class="form-group">
-    {{ form.sex.label_tag }} {{ form.sex }}
-  </div>
-  <div class="form-group">
-    {{ form.subject_taught.label_tag }} {{ form.subject_taught }}
-  </div>
-  <div class="form-group">
-    {{ form.teaching_experience.label_tag }} {{ form.teaching_experience }}
-  </div>
+    <!-- Personal Info + Academic Info Side by Side -->
+    <div class="form-row">
+      <div class="form-card" style="flex: 1">
+        <h3>Personal Information</h3>
+        <div class="grid-2">
+          <div class="form-group">{{ form.full_name.label_tag }} {{ form.full_name }}</div>
+          <div class="form-group">{{ form.email.label_tag }} {{ form.email }}</div>
+          <div class="form-group">{{ form.sex.label_tag }} {{ form.sex }}</div>
+          <div class="form-group">{{ form.subject_taught.label_tag }} {{ form.subject_taught }}</div>
+          <div class="form-group">{{ form.teaching_experience.label_tag }} {{ form.teaching_experience }}</div>
+        </div>
+      </div>
 
-  <!-- Current School Information -->
-  <h3>Current School Information</h3>
-  <div class="form-group">
-    {{ form.current_region.label_tag }} {{ form.current_region }}
-  </div>
-  <div class="form-group">
-    {{ form.current_district.label_tag }} {{ form.current_district }}
-  </div>
-  <div class="form-group">
-    {{ form.current_ward.label_tag }} {{ form.current_ward }}
-  </div>
-  <div class="form-group">
-    {{ form.current_school.label_tag }} {{ form.current_school }}
-  </div>
-
-  <!-- Desired School Information -->
-  <h3>Desired School Information</h3>
-  <div class="form-group">
-    {{ form.desired_region.label_tag }} {{ form.desired_region }}
-  </div>
-  <div class="form-group">
-    {{ form.desired_district.label_tag }} {{ form.desired_district }}
-  </div>
-  <div class="form-group">
-    {{ form.desired_ward.label_tag }} {{ form.desired_ward }}
-  </div>
-  <div class="form-group">
-    {{ form.desired_school.label_tag }} {{ form.desired_school }}
-  </div>
-
-  <!-- Reason -->
-  <h3>Reason for Transfer</h3>
-  <div class="form-group">
-    {{ form.reason.label_tag }} {{ form.reason }}
-  </div>
-
-  <!-- Academic Info -->
-  <fieldset class="border p-3 mt-4">
-    <legend class="w-auto"><h4>Academic Information</h4></legend>
-
-    <div class="form-group">
-      {{ form.form_four_index.label_tag }} {{ form.form_four_index }}
-    </div>
-    <div class="form-group">
-      {{ form.form_four_certificate.label_tag }} {{ form.form_four_certificate }}
+      <div class="form-card" style="flex: 1.1">
+        <h3>Academic Information</h3>
+        <div class="grid-3">
+          <div class="form-group">{{ form.form_four_index.label_tag }} {{ form.form_four_index }}</div>
+          <div class="form-group">{{ form.form_four_certificate.label_tag }} {{ form.form_four_certificate }}</div>
+          <div class="form-group">{{ form.form_six_or_diploma_index.label_tag }} {{ form.form_six_or_diploma_index }}</div>
+          <div class="form-group">{{ form.form_six_or_diploma_certificate.label_tag }} {{ form.form_six_or_diploma_certificate }}</div>
+          <div class="form-group">{{ form.university_reg_number.label_tag }} {{ form.university_reg_number }}</div>
+          <div class="form-group">{{ form.university_certificate.label_tag }} {{ form.university_certificate }}</div>
+        </div>
+      </div>
     </div>
 
-    <div class="form-group">
-      {{ form.form_six_or_diploma_index.label_tag }} {{ form.form_six_or_diploma_index }}
+    <!-- Current School + Desired School Side by Side -->
+    <div class="form-row">
+      <div class="form-card">
+        <h3>Current School</h3>
+        <div class="grid-2">
+          <div class="form-group">{{ form.current_region.label_tag }} {{ form.current_region }}</div>
+          <div class="form-group">{{ form.current_district.label_tag }} {{ form.current_district }}</div>
+          <div class="form-group">{{ form.current_ward.label_tag }} {{ form.current_ward }}</div>
+          <div class="form-group">{{ form.current_school.label_tag }} {{ form.current_school }}</div>
+        </div>
+      </div>
+
+      <div class="form-card">
+        <h3>Desired School</h3>
+        <div class="grid-2">
+          <div class="form-group">{{ form.desired_region.label_tag }} {{ form.desired_region }}</div>
+          <div class="form-group">{{ form.desired_district.label_tag }} {{ form.desired_district }}</div>
+          <div class="form-group">{{ form.desired_ward.label_tag }} {{ form.desired_ward }}</div>
+          <div class="form-group">{{ form.desired_school.label_tag }} {{ form.desired_school }}</div>
+        </div>
+      </div>
     </div>
-    <div class="form-group">
-      {{ form.form_six_or_diploma_certificate.label_tag }} {{ form.form_six_or_diploma_certificate }}
+
+    <!-- Reason -->
+    <div class="form-card">
+      <h3>Reason for Transfer</h3>
+      <div class="form-group">
+        {{ form.reason.label_tag }} {{ form.reason }}
+      </div>
     </div>
 
-    <div class="form-group">
-      {{ form.university_reg_number.label_tag }} {{ form.university_reg_number }}
+    <!-- Submit -->
+    <div class="submit-area">
+      <button type="submit"><i class="fas fa-paper-plane"></i> Submit Request</button>
     </div>
-    <div class="form-group">
-      {{ form.university_certificate.label_tag }} {{ form.university_certificate }}
-    </div>
-  </fieldset>
-
-  <button type="submit" class="btn btn-primary mt-4">Submit Request</button>
-</form>
-
-<!-- JavaScript for cascading dropdowns -->
-<script>
-  document.getElementById('id_current_region').addEventListener('change', function () {
-    const region_id = this.value;
-    fetch(`/transfers/districts/?region_id=${region_id}`)
-      .then(res => res.json())
-      .then(data => {
-        const districtSelect = document.getElementById('id_current_district');
-        districtSelect.innerHTML = '';
-        data.districts.forEach(d => {
-          const opt = document.createElement('option');
-          opt.value = d.id;
-          opt.text = d.name;
-          districtSelect.appendChild(opt);
-        });
-      });
-  });
-
-  document.getElementById('id_current_district').addEventListener('change', function () {
-    const district_id = this.value;
-    fetch(`/transfers/wards/?district_id=${district_id}`)
-      .then(res => res.json())
-      .then(data => {
-        const wardSelect = document.getElementById('id_current_ward');
-        wardSelect.innerHTML = '';
-        data.wards.forEach(w => {
-          const opt = document.createElement('option');
-          opt.value = w.id;
-          opt.text = w.name;
-          wardSelect.appendChild(opt);
-        });
-      });
-  });
-
-  document.getElementById('id_current_ward').addEventListener('change', function () {
-    const ward_id = this.value;
-    fetch(`/transfers/schools/?ward_id=${ward_id}`)
-      .then(res => res.json())
-      .then(data => {
-        const schoolSelect = document.getElementById('id_current_school');
-        schoolSelect.innerHTML = '';
-        data.schools.forEach(s => {
-          const opt = document.createElement('option');
-          opt.value = s.id;
-          opt.text = s.name;
-          schoolSelect.appendChild(opt);
-        });
-      });
-  });
-
-  document.getElementById('id_desired_region').addEventListener('change', function () {
-    const region_id = this.value;
-    fetch(`/transfers/districts/?region_id=${region_id}`)
-      .then(res => res.json())
-      .then(data => {
-        const districtSelect = document.getElementById('id_desired_district');
-        districtSelect.innerHTML = '<option value="">---------</option>';
-        data.districts.forEach(d => {
-          const opt = document.createElement('option');
-          opt.value = d.id;
-          opt.text = d.name;
-          districtSelect.appendChild(opt);
-        });
-
-        document.getElementById('id_desired_ward').innerHTML = '<option value="">---------</option>';
-        document.getElementById('id_desired_school').innerHTML = '<option value="">---------</option>';
-      });
-  });
-
-  document.getElementById('id_desired_district').addEventListener('change', function () {
-    const district_id = this.value;
-    fetch(`/transfers/wards/?district_id=${district_id}`)
-      .then(res => res.json())
-      .then(data => {
-        const wardSelect = document.getElementById('id_desired_ward');
-        wardSelect.innerHTML = '<option value="">---------</option>';
-        data.wards.forEach(w => {
-          const opt = document.createElement('option');
-          opt.value = w.id;
-          opt.text = w.name;
-          wardSelect.appendChild(opt);
-        });
-
-        document.getElementById('id_desired_school').innerHTML = '<option value="">---------</option>';
-      });
-  });
-
-  document.getElementById('id_desired_ward').addEventListener('change', function () {
-    const ward_id = this.value;
-    fetch(`/transfers/schools/?ward_id=${ward_id}`)
-      .then(res => res.json())
-      .then(data => {
-        const schoolSelect = document.getElementById('id_desired_school');
-        schoolSelect.innerHTML = '<option value="">---------</option>';
-        data.schools.forEach(s => {
-          const opt = document.createElement('option');
-          opt.value = s.id;
-          opt.text = s.name;
-          schoolSelect.appendChild(opt);
-        });
-      });
-  });
-</script>
+  </form>
+</div>
 
 </body>
 </html>

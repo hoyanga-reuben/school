@@ -4,6 +4,7 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Group
 from django.core.exceptions import ObjectDoesNotExist
 from socket import timeout
+from .models import Message
 
 from . import models
 
@@ -152,3 +153,4 @@ admin.site.register(models.Region)
 admin.site.register(models.District)
 admin.site.register(models.Ward)
 admin.site.register(models.School)
+admin.site.register(Message)

@@ -1,0 +1,21 @@
+{% extends "base_generic.html" %}
+{% block content %}
+<div class="container mt-4">
+  <h4>trash Messages</h4>
+  <hr>
+  {% if messages %}
+    <ul class="list-group">
+      {% for msg in messages %}
+        <li class="list-group-item">
+          <strong>To:</strong> {{ msg.receiver.get_full_name }} <br>
+          <small>{{ msg.sent_at|date:"Y-m-d H:i" }}</small><br>
+          {{ msg.content|truncatewords:20 }}
+          <a href="{% url 'view_thread' msg.thread.id %}" class="btn btn-sm btn-link float-end">View</a>
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p>No messages found.</p>
+  {% endif %}
+</div>
+{% endblock %}

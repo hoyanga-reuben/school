@@ -1,4 +1,4 @@
-from django.urls import path
+from django.urls import path,include
 from django.contrib.auth.views import LogoutView 
 from django.contrib.auth import views as auth_views
 from .views import all_users_api
@@ -10,7 +10,7 @@ from .views import custom_login
 app_name = 'transfers'
 
 urlpatterns = [
-     
+    path('messaging/', include('transfers.urls_messaging')),  # 👈 link messaging 
     path('home/', views.home, name='home'),
     path('login/', custom_login, name='login'), 
     path('dashboard/', views.main_dashboard, name='main_dashboard'),
@@ -48,5 +48,10 @@ urlpatterns = [
     path('outgoing/', views.outgoing_transfers, name='outgoing_transfers'),
     path('district/', views.district_transfers, name='district_transfers'),
     path('inter-region/', views.inter_region_transfers, name='inter_region_transfers'),
-
+    path('inbox/', views.inbox, name='inbox'),
+    path('send-message/', views.send_message, name='send_message'),
+    path('unread-count/', views.unread_count, name='unread_count'),
+    path('exchange/received/', views.received_exchange_requests, name='received_exchange_requests'),
+    path('exchange/approve/<int:request_id>/', views.approve_exchange, name='approve_exchange'),
+    path('exchange/reject/<int:request_id>/', views.reject_exchange, name='reject_exchange')
 ]

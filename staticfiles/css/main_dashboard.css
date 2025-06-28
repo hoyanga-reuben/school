@@ -1,135 +1,171 @@
 /* General Layout */
+body {
+  padding-top: 80px; /* Adjust this based on your header's actual height */
+}
+
 .dashboard-container {
-    display: flex;
-    min-height: 100vh;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  display: flex;
+  min-height: 100vh;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  position: relative; /* Needed for z-index context */
+}
+
+/* Header */
+header {
+  width: 100%; /* Ensure header spans full width */
+  z-index: 1020; /* Higher than sidebar, less than modals */
 }
 
 /* Sidebar */
 .sidebar {
-    width: 100px; /* Reduced width */
-    background: #1d2a38;
-    color: #fff;
-    display: flex;
-    flex-direction: column;
-    padding: 20px 10px; /* Adjusted padding */
-    box-shadow: 2px 0 6px rgba(0,0,0,0.1);
+  width: 250px; /* Increased width */
+  background: #192839;
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  padding: 20px 15px;
+  box-shadow: 2px 0 6px rgba(21, 13, 13, 0.1);
+  position: fixed; /* Keeps sidebar in place */
+  top: 0;
+  left: 0;
+  bottom: 0;
+  overflow-y: auto;
+  z-index: 1010; /* Lower than header */
 }
 
 .sidebar-header h2 {
-    text-align: center;
-    font-size: 22px;
-    color: #f4f4f4;
-    margin-bottom: 25px;
+  text-align: center;
+  font-size: 22px;
+  color: #f4f4f4;
+  margin-bottom: 25px;
 }
 
 .sidebar-links {
-    list-style: none;
-    padding: 0;
-    margin: 0;
+  list-style: none;
+  padding: 0;
+  margin: 0;
 }
 
 .sidebar-links li {
-    margin: 12px 0;
+  margin: 12px 0;
 }
 
 .sidebar-links a {
-    color: #d1d1d1;
-    text-decoration: none;
-    font-size: 16px;
-    padding: 10px 12px;
-    border-radius: 8px;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    transition: 0.3s ease;
+  color: #d1d1d1;
+  text-decoration: none;
+  font-size: 16px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  transition: 0.3s ease;
 }
 
 .sidebar-links a:hover {
-    background: #34495e;
-    color: #fff;
+  background: #34495e;
+  color: #fff;
 }
 
 .sidebar-links a.active {
-    background: #2980b9;
-    color: #fff;
+  background: #2980b9;
+  color: #fff;
 }
 
 /* Main Content */
 .main-content {
-    flex-grow: 1;
-    padding: 30px;
-    background: #f4f6f8;
-    overflow-x: hidden;
-    margin-left: 180px; /* Adjusted to the sidebar width */
+  margin-left: 250px; /* Pushes content away from sidebar */
+  padding: 30px;
+  /* Removed padding-top here as it's now handled by body padding-top */
+  flex: 1;
+  background: #f4f6f8;
+  overflow-x: hidden;
 }
 
-/* Responsive Adjustments for Mobile */
+/* Responsive Adjustments */
 @media screen and (max-width: 768px) {
-    .sidebar {
-        width: 120px; /* Smaller sidebar for mobile */
-    }
+  .sidebar {
+      width: 0; /* Hide sidebar by default on small screens */
+      overflow-x: hidden; /* Prevent horizontal scrollbar */
+      transition: 0.3s ease; /* Smooth transition for showing/hiding */
+  }
 
-    .main-content {
-        margin-left: 120px; /* Adjusted for mobile */
-    }
+  .sidebar.active { /* Add a class 'active' to show sidebar with JS */
+      width: 180px;
+  }
+
+  .main-content {
+      margin-left: 0; /* No margin on small screens */
+      padding-top: 30px; /* Add padding top back for small screens if needed, otherwise removed for fixed header */
+  }
+
+  /* You might need a "hamburger" icon and JavaScript to toggle the sidebar.
+     Example:
+     .sidebar-toggle-btn {
+         display: block; // Show on small screens
+         position: fixed;
+         top: 15px;
+         left: 15px;
+         z-index: 1030;
+     }
+  */
 }
 
-/* Navbar Styles */
+/* Navbar Styles (if used) - These styles are for the old navbar and are largely irrelevant now, but keeping them for completeness. */
 .navbar {
-    background-color: #1b3a57;
-    color: white;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 12px 25px;
-    position: sticky;
-    top: 0;
-    z-index: 999;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  background-color: #1b3a57;
+  color: white;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 25px;
+  position: sticky;
+  top: 0;
+  z-index: 999;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
 }
 
 .navbar-left {
-    display: flex;
-    align-items: center;
+  display: flex;
+  align-items: center;
 }
 
 .navbar-logo {
-    height: 38px;
-    margin-right: 10px;
+  height: 38px;
+  margin-right: 10px;
 }
 
 .navbar-title {
-    font-size: 18px;
-    font-weight: bold;
+  font-size: 18px;
+  font-weight: bold;
 }
 
 .navbar-links {
-    display: flex;
-    align-items: center;
-    gap: 16px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
 }
 
 .navbar-links a {
-    color: white;
-    text-decoration: none;
-    font-weight: 500;
+  color: white;
+  text-decoration: none;
+  font-weight: 500;
 }
 
 .navbar-links a:hover {
-    text-decoration: underline;
+  text-decoration: underline;
 }
 
 .navbar-user {
-    display: flex;
-    align-items: center;
-    gap: 8px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 .navbar-user-image {
-    width: 32px;
-    height: 32px;
-    border-radius: 50%;
-    object-fit: cover;
-    border: 2px solid white;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid white;
 }

@@ -1,0 +1,45 @@
+{% extends 'base_generic.html' %}
+{% block content %}
+<div class="container mt-4">
+  <h3 class="mb-3">📨 Exchange Requests Received</h3>
+
+  {% if requests %}
+    <table class="table table-striped table-bordered">
+      <thead class="table-dark">
+        <tr>
+          <th>From</th>
+          <th>School 1</th>
+          <th>To School</th>
+          <th>Reason</th>
+          <th>Message</th>
+          <th>Status</th>
+          <th>Date</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for req in requests %}
+          <tr>
+            <td>{{ req.teacher_1.get_full_name }}</td>
+            <td>{{ req.school_1.name }}</td>
+            <td>{{ req.school_2.name }}</td>
+            <td>{{ req.reason|truncatewords:12 }}</td>
+            <td>{{ req.message|default:"-" }}</td>
+            <td>
+              <span class="badge 
+                {% if req.status == 'Pending' %}bg-warning
+                {% elif req.status == 'Approved' %}bg-success
+                {% elif req.status == 'Rejected' %}bg-danger
+                {% endif %}">
+                {{ req.status }}
+              </span>
+            </td>
+            <td>{{ req.created_at|date:"Y-m-d H:i" }}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    <div class="alert alert-info">No exchange requests received.</div>
+  {% endif %}
+</div>
+{% endblock %}

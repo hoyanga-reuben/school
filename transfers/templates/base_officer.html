@@ -43,7 +43,8 @@
         <nav class="navbar-links">
             <a href="{% url 'transfers:main_dashboard' %}">Dashboard</a>
             <a href="{% url 'transfers:profile' %}">Profile</a>
-            <a href="{% url 'transfers:logout' %}">Logout</a>
+            <form id="logout-form" action="{% url 'logout' %}" method="post" style="display: none;">{% csrf_token %}</form>
+        <a class="nav-link" href="#" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">Logout</a>
         </nav>
     </div>
 </header>
@@ -69,7 +70,10 @@
             {% endif %}
 
             <li><a href="{% url 'transfers:profile' %}" class="{% if request.resolver_match.url_name == 'profile' %}active{% endif %}"><i class="fas fa-user"></i> <span>Profile</span></a></li>
-            <li><a href="{% url 'transfers:logout' %}"><i class="fas fa-sign-out-alt"></i> <span>Logout</span></a></li>
+            <li class="nav-item">
+                <form id="logout-form" action="{% url 'logout' %}" method="post" style="display: none;">{% csrf_token %}</form>
+                <a class="nav-link" href="#" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">Logout</a>
+              </li>
         </ul>
     </nav>
 
